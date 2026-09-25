@@ -1,4 +1,4 @@
-import { useSignIn } from '@clerk/clerk-expo';
+import { useSignIn } from '@clerk/expo';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
@@ -9,62 +9,65 @@ import { PrimaryButton } from '@/components/primary-button';
 import { getClerkErrorMessage } from '@/lib/clerk-errors';
 
 export default function SignInScreen() {
-  const { signIn, setActive, isLoaded } = useSignIn();
+  const { signIn, fetchStatus } = useSignIn();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [needsEmailCode, setNeedsEmailCode] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const loading = fetchStatus === 'fetching';
+
+  // The root layout's Stack.Protected guard moves the user into (tabs) once the session is active.
+  const finalize = async () => {
+    const { error: finalizeError } = await signIn.finalize();
+    if (finalizeError) setError(getClerkErrorMessage(finalizeError));
+  };
+
   const onSignIn = async () => {
-    if (!isLoaded) return;
-    setLoading(true);
     setError(null);
-    try {
-      const attempt = await signIn.create({ identifier: email.trim(), password });
-
-      if (attempt.status === 'complete') {
-        // The root layout's Stack.Protected guard moves the user into (tabs).
-        await setActive({ session: attempt.createdSessionId });
-        return;
-      }
-
-      // Clerk can ask for an emailed code as a second factor (e.g. signing in on a new device).
-      const emailCodeFactor = attempt.supportedSecondFactors?.find(
-        (factor) => factor.strategy === 'email_code'
-      );
-      if (attempt.status === 'needs_second_factor' && emailCodeFactor) {
-        await signIn.prepareSecondFactor({ strategy: 'email_code' });
-        setNeedsEmailCode(true);
-        return;
-      }
-
-      setError(`Sign-in needs another step this app doesn't support yet (${attempt.status}).`);
-    } catch (err) {
-      setError(getClerkErrorMessage(err));
-    } finally {
-      setLoading(false);
+    const { error: passwordError } = await signIn.password({ identifier: email.trim(), password });
+    if (passwordError) {
+      setError(getClerkErrorMessage(passwordError));
+      return;
     }
+
+    if (signIn.status === 'complete') {
+      await finalize();
+      return;
+    }
+
+    // Clerk asks for an emailed code on new devices (Device Trust) or when email MFA is on.
+    const canUseEmailCode =
+      signIn.status === 'needs_client_trust' ||
+      (signIn.status === 'needs_second_factor' &&
+        signIn.supportedSecondFactors.some((factor) => factor.strategy === 'email_code'));
+    if (canUseEmailCode) {
+      const { error: sendError } = await signIn.mfa.sendEmailCode();
+      if (sendError) {
+        setError(getClerkErrorMessage(sendError));
+        return;
+      }
+      setNeedsEmailCode(true);
+      return;
+    }
+
+    setError(`Sign-in needs another step this app doesn't support yet (${signIn.status}).`);
   };
 
   const onVerifyCode = async () => {
-    if (!isLoaded) return;
-    setLoading(true);
     setError(null);
-    try {
-      const attempt = await signIn.attemptSecondFactor({ strategy: 'email_code', code: code.trim() });
-      if (attempt.status === 'complete') {
-        await setActive({ session: attempt.createdSessionId });
-        return;
-      }
-      setError(`Verification incomplete (${attempt.status}).`);
-    } catch (err) {
-      setError(getClerkErrorMessage(err));
-    } finally {
-      setLoading(false);
+    const { error: verifyError } = await signIn.mfa.verifyEmailCode({ code: code.trim() });
+    if (verifyError) {
+      setError(getClerkErrorMessage(verifyError));
+      return;
     }
+    if (signIn.status === 'complete') {
+      await finalize();
+      return;
+    }
+    setError(`Verification incomplete (${signIn.status}).`);
   };
 
   if (needsEmailCode) {
@@ -114,7 +117,7 @@ export default function SignInScreen() {
         title="Sign in"
         onPress={onSignIn}
         loading={loading}
-        disabled={!isLoaded || !email || !password}
+        disabled={!email || !password}
       />
       <View className="flex-row justify-center gap-1">
         <Text className="text-neutral-500 dark:text-neutral-400">Don&apos;t have an account?</Text>

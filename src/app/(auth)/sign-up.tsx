@@ -1,4 +1,4 @@
-import { useSignUp } from '@clerk/clerk-expo';
+import { useSignUp } from '@clerk/expo';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
@@ -9,54 +9,61 @@ import { PrimaryButton } from '@/components/primary-button';
 import { getClerkErrorMessage } from '@/lib/clerk-errors';
 
 export default function SignUpScreen() {
-  const { signUp, setActive, isLoaded } = useSignUp();
+  const { signUp, fetchStatus } = useSignUp();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [pendingVerification, setPendingVerification] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const loading = fetchStatus === 'fetching';
+
+  // The root layout's Stack.Protected guard moves the user into (tabs) once the session is active.
+  const finalize = async () => {
+    const { error: finalizeError } = await signUp.finalize();
+    if (finalizeError) setError(getClerkErrorMessage(finalizeError));
+  };
+
   const onSignUp = async () => {
-    if (!isLoaded) return;
-    setLoading(true);
     setError(null);
-    try {
-      const attempt = await signUp.create({ emailAddress: email.trim(), password });
-
-      // Email verification is off in the Clerk instance: the account is ready now.
-      if (attempt.status === 'complete') {
-        await setActive({ session: attempt.createdSessionId });
-        return;
-      }
-
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-      setPendingVerification(true);
-    } catch (err) {
-      setError(getClerkErrorMessage(err));
-    } finally {
-      setLoading(false);
+    const { error: passwordError } = await signUp.password({
+      emailAddress: email.trim(),
+      password,
+    });
+    if (passwordError) {
+      setError(getClerkErrorMessage(passwordError));
+      return;
     }
+
+    // Email verification is off in the Clerk instance: the account is ready now.
+    if (signUp.status === 'complete') {
+      await finalize();
+      return;
+    }
+
+    const { error: sendError } = await signUp.verifications.sendEmailCode();
+    if (sendError) {
+      setError(getClerkErrorMessage(sendError));
+      return;
+    }
+    setPendingVerification(true);
   };
 
   const onVerify = async () => {
-    if (!isLoaded) return;
-    setLoading(true);
     setError(null);
-    try {
-      const attempt = await signUp.attemptEmailAddressVerification({ code: code.trim() });
-      if (attempt.status === 'complete') {
-        // The root layout's Stack.Protected guard moves the user into (tabs).
-        await setActive({ session: attempt.createdSessionId });
-        return;
-      }
-      setError(`Sign-up incomplete — missing: ${attempt.missingFields.join(', ') || attempt.status}.`);
-    } catch (err) {
-      setError(getClerkErrorMessage(err));
-    } finally {
-      setLoading(false);
+    const { error: verifyError } = await signUp.verifications.verifyEmailCode({
+      code: code.trim(),
+    });
+    if (verifyError) {
+      setError(getClerkErrorMessage(verifyError));
+      return;
     }
+    if (signUp.status === 'complete') {
+      await finalize();
+      return;
+    }
+    setError(`Sign-up incomplete — missing: ${signUp.missingFields.join(', ') || signUp.status}.`);
   };
 
   if (pendingVerification) {
@@ -111,7 +118,7 @@ export default function SignUpScreen() {
         title="Sign up"
         onPress={onSignUp}
         loading={loading}
-        disabled={!isLoaded || !email || !password}
+        disabled={!email || !password}
       />
       <View className="flex-row justify-center gap-1">
         <Text className="text-neutral-500 dark:text-neutral-400">Already have an account?</Text>

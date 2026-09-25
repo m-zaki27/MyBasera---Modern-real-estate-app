@@ -1,4 +1,4 @@
-import { useClerk, useUser } from '@clerk/clerk-expo';
+import { useClerk, useUser } from '@clerk/expo';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 

@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
-    "@clerk/clerk-expo": "^2.20.1",
+    "@clerk/expo": "^4.7.0",
     "@expo/ui": "~57.0.20",
     "@supabase/supabase-js": "^2.117.1",
     "expo": "~57.0.25",

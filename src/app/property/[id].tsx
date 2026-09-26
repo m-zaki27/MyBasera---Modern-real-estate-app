@@ -1,64 +1,21 @@
 import { Image } from 'expo-image';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
-import type { ReactNode } from 'react';
-import {
-  ActivityIndicator,
-  Linking,
-  Pressable,
-  ScrollView,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AgentCard } from '@/components/agent-card';
+import { BackButton } from '@/components/back-button';
 import { FavoriteButton } from '@/components/favorite-button';
 import { PrimaryButton } from '@/components/primary-button';
 import { PropertySpecs } from '@/components/property-specs';
 import { ReviewItem } from '@/components/review-item';
+import { ScreenMessage } from '@/components/screen-message';
 import { colors } from '@/constants/colors';
 import { useProperty } from '@/hooks/use-property';
 import { formatPrice } from '@/lib/format';
 import { getMapsUrl } from '@/lib/maps';
-
-function BackButton() {
-  const insets = useSafeAreaInsets();
-  const isDark = useColorScheme() === 'dark';
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/'));
-
-  return (
-    <Pressable
-      onPress={goBack}
-      accessibilityRole="button"
-      accessibilityLabel="Go back"
-      hitSlop={8}
-      // Offset below the status bar; the inset is a runtime value NativeWind can't express.
-      style={{ top: insets.top + 8 }}
-      className="absolute left-4 z-10 h-10 w-10 items-center justify-center rounded-full bg-background/90 dark:bg-background-dark/90">
-      <SymbolView
-        name={{ ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' }}
-        tintColor={isDark ? colors.foreground.dark : colors.foreground.DEFAULT}
-        size={20}
-      />
-    </Pressable>
-  );
-}
-
-type CenteredMessageProps = {
-  children: ReactNode;
-};
-
-function CenteredMessage({ children }: CenteredMessageProps) {
-  return (
-    <View className="flex-1 items-center justify-center gap-4 bg-background px-screen dark:bg-background-dark">
-      <BackButton />
-      {children}
-    </View>
-  );
-}
 
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -67,15 +24,15 @@ export default function PropertyDetailsScreen() {
 
   if (loading) {
     return (
-      <CenteredMessage>
+      <ScreenMessage>
         <ActivityIndicator color={colors.primary.DEFAULT} />
-      </CenteredMessage>
+      </ScreenMessage>
     );
   }
 
   if (error) {
     return (
-      <CenteredMessage>
+      <ScreenMessage>
         <Text className="text-center text-base text-foreground dark:text-foreground-dark">
           Couldn&apos;t load this property.
         </Text>
@@ -83,17 +40,17 @@ export default function PropertyDetailsScreen() {
         <View className="w-full">
           <PrimaryButton title="Try again" onPress={retry} />
         </View>
-      </CenteredMessage>
+      </ScreenMessage>
     );
   }
 
   if (!property) {
     return (
-      <CenteredMessage>
+      <ScreenMessage>
         <Text className="text-center text-base text-foreground dark:text-foreground-dark">
           This property isn&apos;t available anymore.
         </Text>
-      </CenteredMessage>
+      </ScreenMessage>
     );
   }
 

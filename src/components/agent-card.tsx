@@ -1,13 +1,12 @@
 import { Image } from 'expo-image';
+import { Link } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { Linking, Pressable, Text, View } from 'react-native';
 
 import { colors } from '@/constants/colors';
-import type { PropertyDetail } from '@/hooks/use-property';
+import type { Agent } from '@/types/database';
 
-type AgentCardProps = {
-  agent: NonNullable<PropertyDetail['agent']>;
-};
+type AgentSummary = Pick<Agent, 'id' | 'name' | 'avatar' | 'email' | 'phone'>;
 
 type ContactButtonProps = {
   icon: SymbolViewProps['name'];
@@ -15,7 +14,7 @@ type ContactButtonProps = {
   url: string;
 };
 
-function ContactButton({ icon, label, url }: ContactButtonProps) {
+export function ContactButton({ icon, label, url }: ContactButtonProps) {
   return (
     <Pressable
       onPress={() => Linking.openURL(url)}
@@ -28,21 +27,13 @@ function ContactButton({ icon, label, url }: ContactButtonProps) {
   );
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+type AgentContactButtonsProps = {
+  agent: AgentSummary;
+};
+
+export function AgentContactButtons({ agent }: AgentContactButtonsProps) {
   return (
-    <View className="flex-row items-center gap-3 rounded-card border border-border p-4 dark:border-border-dark">
-      <Image
-        source={agent.avatar ? { uri: agent.avatar } : undefined}
-        className="h-12 w-12 rounded-full bg-surface dark:bg-surface-dark"
-        contentFit="cover"
-        accessibilityIgnoresInvertColors
-      />
-      <View className="flex-1">
-        <Text className="text-base font-semibold text-foreground dark:text-foreground-dark">
-          {agent.name}
-        </Text>
-        <Text className="text-sm text-muted dark:text-muted-dark">Listing agent</Text>
-      </View>
+    <View className="flex-row gap-2">
       {agent.phone ? (
         <ContactButton
           icon={{ ios: 'phone.fill', android: 'call', web: 'call' }}
@@ -57,6 +48,38 @@ export function AgentCard({ agent }: AgentCardProps) {
           url={`mailto:${agent.email}`}
         />
       ) : null}
+    </View>
+  );
+}
+
+type AgentCardProps = {
+  agent: AgentSummary;
+};
+
+export function AgentCard({ agent }: AgentCardProps) {
+  return (
+    <View className="flex-row items-center gap-3 rounded-card border border-border p-4 dark:border-border-dark">
+      {/* Only the avatar + name link to the agent; the contact buttons stay separate presses. */}
+      <Link href={{ pathname: '/agent/[id]', params: { id: agent.id } }} asChild>
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={`${agent.name}, view agent profile`}
+          className="flex-1 flex-row items-center gap-3 active:opacity-70">
+          <Image
+            source={agent.avatar ? { uri: agent.avatar } : undefined}
+            className="h-12 w-12 rounded-full bg-surface dark:bg-surface-dark"
+            contentFit="cover"
+            accessibilityIgnoresInvertColors
+          />
+          <View className="flex-1">
+            <Text className="text-base font-semibold text-foreground dark:text-foreground-dark">
+              {agent.name}
+            </Text>
+            <Text className="text-sm text-primary">View profile</Text>
+          </View>
+        </Pressable>
+      </Link>
+      <AgentContactButtons agent={agent} />
     </View>
   );
 }

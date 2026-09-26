@@ -4,7 +4,7 @@ import type { PropertyTypeFilter } from '@/constants/property';
 import { supabase } from '@/lib/supabase';
 import type { Property } from '@/types/database';
 
-const LIST_COLUMNS =
+export const LIST_COLUMNS =
   'id, name, type, price, address, bedrooms, bathrooms, area, rating, image_url' as const;
 
 export type PropertyListItem = Pick<

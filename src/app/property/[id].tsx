@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AgentCard } from '@/components/agent-card';
+import { FavoriteButton } from '@/components/favorite-button';
 import { PrimaryButton } from '@/components/primary-button';
 import { PropertySpecs } from '@/components/property-specs';
 import { ReviewItem } from '@/components/review-item';
@@ -102,6 +103,12 @@ export default function PropertyDetailsScreen() {
     <View className="flex-1 bg-background dark:bg-background-dark">
       <StatusBar style="light" />
       <BackButton />
+      <View
+        // Same runtime status-bar offset as the back button.
+        style={{ top: insets.top + 8 }}
+        className="absolute right-4 z-10">
+        <FavoriteButton propertyId={property.id} propertyName={property.name} size="md" />
+      </View>
       <ScrollView
         // Keep the last section clear of the home indicator.
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}>

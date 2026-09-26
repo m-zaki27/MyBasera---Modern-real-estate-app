@@ -8,12 +8,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { useFavoritesSync } from '@/hooks/use-favorites-sync';
 import { clerkPublishableKey } from '@/lib/clerk';
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { isLoaded, isSignedIn } = useAuth();
+  useFavoritesSync();
 
   // Keep the native splash screen up until Clerk has restored any cached session,
   // so signed-in users never see a flash of the sign-in screen.

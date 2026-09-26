@@ -1,12 +1,11 @@
 import { useUser } from '@clerk/expo';
-import { Link } from 'expo-router';
 import type { ReactElement } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FilterChips } from '@/components/filter-chips';
 import { PrimaryButton } from '@/components/primary-button';
-import { PropertyCard } from '@/components/property-card';
+import { PropertyCardLink } from '@/components/property-card-link';
 import { SearchBar } from '@/components/search-bar';
 import { colors } from '@/constants/colors';
 import { PROPERTY_TYPE_FILTERS } from '@/constants/property';
@@ -88,16 +87,7 @@ export default function HomeScreen() {
         <FlatList
           data={error ? [] : properties}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Link href={{ pathname: '/property/[id]', params: { id: item.id } }} asChild>
-              <Pressable
-                accessibilityRole="link"
-                accessibilityLabel={`${item.name}, view details`}
-                className="px-screen active:opacity-80">
-                <PropertyCard property={item} />
-              </Pressable>
-            </Link>
-          )}
+          renderItem={({ item }) => <PropertyCardLink property={item} />}
           ListHeaderComponent={header}
           ListEmptyComponent={emptyState}
           contentContainerClassName="gap-4 pb-8"

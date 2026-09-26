@@ -23,8 +23,10 @@ export function SegmentedControl<T extends string>({
             onPress={() => onSelect(option.key)}
             accessibilityRole="tab"
             accessibilityState={{ selected: isSelected }}
+            // Both states set the same style properties (no shadow, always a background) so
+            // switching tabs never makes NativeWind remount the Pressable.
             className={`flex-1 items-center rounded-lg py-2 ${
-              isSelected ? 'bg-background shadow-sm dark:bg-border-dark' : ''
+              isSelected ? 'bg-background dark:bg-border-dark' : 'bg-transparent'
             }`}>
             <Text
               className={`text-sm font-semibold ${

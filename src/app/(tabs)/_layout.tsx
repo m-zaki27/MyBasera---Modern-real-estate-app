@@ -2,6 +2,8 @@ import { Tabs } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import type { ColorValue } from 'react-native';
 
+import { colors } from '@/constants/colors';
+
 type TabIconProps = {
   name: SymbolViewProps['name'];
   color: ColorValue;
@@ -13,7 +15,7 @@ function TabIcon({ name, color }: TabIconProps) {
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.primary.DEFAULT }}>
       <Tabs.Screen
         name="index"
         options={{

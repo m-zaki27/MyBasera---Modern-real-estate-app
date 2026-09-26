@@ -20,10 +20,10 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center gap-6 bg-white px-6 dark:bg-black">
+    <View className="flex-1 items-center justify-center gap-6 bg-background px-6 dark:bg-background-dark">
       <View className="items-center gap-1">
-        <Text className="text-2xl font-bold text-black dark:text-white">Profile</Text>
-        <Text className="text-base text-neutral-500 dark:text-neutral-400">
+        <Text className="text-2xl font-bold text-foreground dark:text-foreground-dark">Profile</Text>
+        <Text className="text-base text-muted dark:text-muted-dark">
           {user?.primaryEmailAddress?.emailAddress}
         </Text>
       </View>

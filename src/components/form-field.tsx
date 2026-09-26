@@ -1,5 +1,7 @@
 import { Text, TextInput, View, type TextInputProps } from 'react-native';
 
+import { colors } from '@/constants/colors';
+
 type FormFieldProps = TextInputProps & {
   label: string;
 };
@@ -7,10 +9,10 @@ type FormFieldProps = TextInputProps & {
 export function FormField({ label, ...inputProps }: FormFieldProps) {
   return (
     <View className="gap-1.5">
-      <Text className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{label}</Text>
+      <Text className="text-sm font-medium text-foreground dark:text-foreground-dark">{label}</Text>
       <TextInput
-        className="rounded-xl border border-neutral-300 bg-white px-4 py-3 text-base text-black dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
-        placeholderTextColor="#a3a3a3"
+        className="rounded-field border border-border bg-background px-4 py-3 text-base text-foreground dark:border-border-dark dark:bg-surface-dark dark:text-foreground-dark"
+        placeholderTextColor={colors.muted.dark}
         {...inputProps}
       />
     </View>

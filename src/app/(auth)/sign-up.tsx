@@ -121,9 +121,9 @@ export default function SignUpScreen() {
         disabled={!email || !password}
       />
       <View className="flex-row justify-center gap-1">
-        <Text className="text-neutral-500 dark:text-neutral-400">Already have an account?</Text>
+        <Text className="text-muted dark:text-muted-dark">Already have an account?</Text>
         <Link href="/sign-in" replace>
-          <Text className="font-semibold text-blue-600">Sign in</Text>
+          <Text className="font-semibold text-primary">Sign in</Text>
         </Link>
       </View>
     </AuthScreenLayout>

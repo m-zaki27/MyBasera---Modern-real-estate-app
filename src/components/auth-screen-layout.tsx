@@ -11,23 +11,23 @@ type AuthScreenLayoutProps = {
 
 export function AuthScreenLayout({ title, subtitle, error, children }: AuthScreenLayoutProps) {
   return (
-    <View className="flex-1 bg-white dark:bg-black">
+    <View className="flex-1 bg-background dark:bg-background-dark">
       {/* SafeAreaView isn't className-aware without a cssInterop mapping; flex is its only style. */}
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           className="flex-1"
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView
-            contentContainerClassName="flex-grow justify-center gap-6 px-6 py-10"
+            contentContainerClassName="flex-grow justify-center gap-6 px-screen py-10"
             keyboardShouldPersistTaps="handled">
             <View className="gap-2">
-              <Text className="text-3xl font-bold text-black dark:text-white">{title}</Text>
+              <Text className="text-3xl font-bold text-foreground dark:text-foreground-dark">{title}</Text>
               {subtitle ? (
-                <Text className="text-base text-neutral-500 dark:text-neutral-400">{subtitle}</Text>
+                <Text className="text-base text-muted dark:text-muted-dark">{subtitle}</Text>
               ) : null}
             </View>
             {error ? (
-              <Text className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+              <Text className="rounded-field bg-danger-soft px-4 py-3 text-sm text-danger-text dark:bg-danger-soft-dark dark:text-danger-text-dark">
                 {error}
               </Text>
             ) : null}

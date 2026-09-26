@@ -13,3 +13,13 @@ export function formatPrice(price: number): string {
 export function formatArea(area: number): string {
   return `${numberFormatter.format(area)} sqft`;
 }
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+
+export function formatDate(isoDate: string): string {
+  return dateFormatter.format(new Date(isoDate));
+}

@@ -1,32 +1,15 @@
 import { Image } from 'expo-image';
-import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import { cssInterop } from 'nativewind';
+import { SymbolView } from 'expo-symbols';
 import { Text, View } from 'react-native';
 
+import { PropertySpecs } from '@/components/property-specs';
 import { colors } from '@/constants/colors';
 import type { PropertyListItem } from '@/hooks/use-properties';
-import { formatArea, formatPrice } from '@/lib/format';
-
-// expo-image isn't a core RN component, so map className → style for NativeWind.
-cssInterop(Image, { className: 'style' });
+import { formatPrice } from '@/lib/format';
 
 type PropertyCardProps = {
   property: PropertyListItem;
 };
-
-type SpecProps = {
-  icon: SymbolViewProps['name'];
-  label: string;
-};
-
-function Spec({ icon, label }: SpecProps) {
-  return (
-    <View className="flex-row items-center gap-1">
-      <SymbolView name={icon} tintColor={colors.muted.DEFAULT} size={14} />
-      <Text className="text-sm text-muted dark:text-muted-dark">{label}</Text>
-    </View>
-  );
-}
 
 export function PropertyCard({ property }: PropertyCardProps) {
   const { name, type, price, address, bedrooms, bathrooms, area, rating, image_url } = property;
@@ -68,21 +51,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
         <Text className="text-sm text-muted dark:text-muted-dark" numberOfLines={1}>
           {address}
         </Text>
-        <View className="mt-1 flex-row gap-4">
-          <Spec
-            icon={{ ios: 'bed.double.fill', android: 'bed', web: 'bed' }}
-            label={bedrooms === 0 ? 'Studio' : `${bedrooms} bd`}
-          />
-          <Spec
-            icon={{ ios: 'shower.fill', android: 'bathtub', web: 'bathtub' }}
-            label={`${bathrooms} ba`}
-          />
-          {area ? (
-            <Spec
-              icon={{ ios: 'square.dashed', android: 'square_foot', web: 'square_foot' }}
-              label={formatArea(area)}
-            />
-          ) : null}
+        <View className="mt-1">
+          <PropertySpecs bedrooms={bedrooms} bathrooms={bathrooms} area={area} />
         </View>
       </View>
     </View>

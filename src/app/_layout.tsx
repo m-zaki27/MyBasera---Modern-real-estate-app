@@ -1,4 +1,5 @@
 import '@/global.css';
+import '@/lib/nativewind-interop';
 
 import { ClerkProvider, useAuth } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
@@ -24,6 +25,7 @@ function RootNavigator() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={isSignedIn}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="property/[id]" />
         </Stack.Protected>
         <Stack.Protected guard={!isSignedIn}>
           <Stack.Screen name="(auth)" />

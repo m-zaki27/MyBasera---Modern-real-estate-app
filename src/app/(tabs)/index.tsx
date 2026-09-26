@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/expo';
+import { Link } from 'expo-router';
 import type { ReactElement } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FilterChips } from '@/components/filter-chips';
@@ -88,9 +89,14 @@ export default function HomeScreen() {
           data={error ? [] : properties}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View className="px-screen">
-              <PropertyCard property={item} />
-            </View>
+            <Link href={{ pathname: '/property/[id]', params: { id: item.id } }} asChild>
+              <Pressable
+                accessibilityRole="link"
+                accessibilityLabel={`${item.name}, view details`}
+                className="px-screen active:opacity-80">
+                <PropertyCard property={item} />
+              </Pressable>
+            </Link>
           )}
           ListHeaderComponent={header}
           ListEmptyComponent={emptyState}

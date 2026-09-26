@@ -5,6 +5,7 @@
   "dependencies": {
     "@clerk/expo": "^4.7.0",
     "@expo/ui": "~57.0.20",
+    "@maplibre/maplibre-react-native": "^11.4.0",
     "@supabase/supabase-js": "^2.117.1",
     "expo": "~57.0.25",
     "expo-constants": "~57.0.19",
@@ -26,7 +27,6 @@
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-gesture-handler": "~2.32.0",
-    "react-native-maps": "1.27.2",
     "react-native-reanimated": "^4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
@@ -37,6 +37,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@types/geojson": "^7946.0.16",
     "@types/react": "~19.2.2",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~57.0.2",

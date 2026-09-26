@@ -8,7 +8,7 @@ type PropertyMapProps = {
   properties: PropertyListItem[];
 };
 
-// react-native-maps has no web implementation, so web gets a pointer to the apps instead.
+// MapLibre React Native is Android/iOS only, so web gets a pointer to the apps instead.
 export function PropertyMap({ properties }: PropertyMapProps) {
   return (
     <View className="flex-1 items-center justify-center gap-3 px-screen">

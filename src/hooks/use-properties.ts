@@ -1,17 +1,24 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 
-import { PRICE_RANGES, type PropertySort, type PropertyTypeFilter } from '@/constants/property';
+import {
+  PRICE_RANGES,
+  type ListingTypeFilter,
+  type PropertySort,
+  type PropertyTypeFilter,
+} from '@/constants/property';
 import { supabase } from '@/lib/supabase';
 import type { Property } from '@/types/database';
 
 export const LIST_COLUMNS =
-  'id, name, type, price, address, latitude, longitude, bedrooms, bathrooms, area, rating, image_url' as const;
+  'id, name, type, listing_type, price, address, latitude, longitude, bedrooms, bathrooms, area, rating, image_url' as const;
 
 export type PropertyListItem = Pick<
   Property,
   | 'id'
   | 'name'
   | 'type'
+  | 'listing_type'
   | 'price'
   | 'address'
   | 'latitude'
@@ -26,6 +33,7 @@ export type PropertyListItem = Pick<
 export type PropertyFilters = {
   query?: string;
   type?: PropertyTypeFilter;
+  listingType?: ListingTypeFilter;
   /** Key from PRICE_RANGES. */
   priceRange?: string;
   minBedrooms?: number;
@@ -52,6 +60,7 @@ function toSearchTerm(query: string): string {
 export function useProperties({
   query = '',
   type = 'All',
+  listingType = 'all',
   priceRange = 'any',
   minBedrooms = 0,
   minBathrooms = 0,
@@ -62,17 +71,22 @@ export function useProperties({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [reloadCount, setReloadCount] = useState(0);
 
   // Stable primitive for the effect deps (arrays are new on every render).
   const facilitiesKey = [...facilities].sort().join('|');
 
-  useEffect(() => {
+  const inFlightRef = useRef<AbortController | null>(null);
+
+  // Starts a fetch (cancelling any still in flight) and returns its cleanup.
+  const load = useCallback(() => {
+    inFlightRef.current?.abort();
     const controller = new AbortController();
+    inFlightRef.current = controller;
 
     let request = supabase.from('properties').select(LIST_COLUMNS).abortSignal(controller.signal);
 
     if (type !== 'All') request = request.eq('type', type);
+    if (listingType !== 'all') request = request.eq('listing_type', listingType);
 
     const term = toSearchTerm(query);
     if (term) request = request.or(`name.ilike.*${term}*,address.ilike.*${term}*`);
@@ -115,12 +129,15 @@ export function useProperties({
     });
 
     return () => controller.abort();
-  }, [query, type, priceRange, minBedrooms, minBathrooms, facilitiesKey, sort, reloadCount]);
+  }, [query, type, listingType, priceRange, minBedrooms, minBathrooms, facilitiesKey, sort]);
+
+  // Refetch on focus too, so edits made on other screens show up when returning here.
+  useFocusEffect(load);
 
   const refresh = useCallback(() => {
     setRefreshing(true);
-    setReloadCount((count) => count + 1);
-  }, []);
+    load();
+  }, [load]);
 
   return { properties, loading, refreshing, error, refresh };
 }

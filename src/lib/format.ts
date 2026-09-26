@@ -1,3 +1,5 @@
+import type { ListingType } from '@/types/database';
+
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -6,15 +8,18 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 
 const numberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
-export function formatPrice(price: number): string {
-  return currencyFormatter.format(price);
+export function formatPrice(price: number, listingType: ListingType = 'sale'): string {
+  const formatted = currencyFormatter.format(price);
+  return listingType === 'rent' ? `${formatted}/mo` : formatted;
 }
 
 /** Short price for map pins: $950, $615K, $1.3M. Hand-rolled because Hermes' Intl compact notation isn't guaranteed. */
-export function formatCompactPrice(price: number): string {
-  if (price >= 1_000_000) return `$${trimZero((price / 1_000_000).toFixed(1))}M`;
-  if (price >= 1_000) return `$${Math.round(price / 1_000)}K`;
-  return `$${Math.round(price)}`;
+export function formatCompactPrice(price: number, listingType: ListingType = 'sale'): string {
+  const suffix = listingType === 'rent' ? '/mo' : '';
+  if (price >= 1_000_000) return `$${trimZero((price / 1_000_000).toFixed(1))}M${suffix}`;
+  if (price >= 10_000) return `$${Math.round(price / 1_000)}K${suffix}`;
+  if (price >= 1_000) return `$${trimZero((price / 1_000).toFixed(1))}K${suffix}`;
+  return `$${Math.round(price)}${suffix}`;
 }
 
 function trimZero(value: string): string {

@@ -13,7 +13,8 @@ type PropertyCardProps = {
 };
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const { id, name, type, price, address, bedrooms, bathrooms, area, rating, image_url } = property;
+  const { id, name, type, listing_type, price, address, bedrooms, bathrooms, area, rating, image_url } =
+    property;
 
   return (
     <View className="overflow-hidden rounded-card border border-border bg-background dark:border-border-dark dark:bg-surface-dark">
@@ -36,7 +37,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               size={12}
             />
             <Text className="text-xs font-semibold text-foreground dark:text-foreground-dark">
-              {rating.toFixed(1)}
+              {rating > 0 ? rating.toFixed(1) : 'New'}
             </Text>
           </View>
         </View>
@@ -52,7 +53,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             numberOfLines={1}>
             {name}
           </Text>
-          <Text className="text-lg font-bold text-primary">{formatPrice(price)}</Text>
+          <Text className="text-lg font-bold text-primary">{formatPrice(price, listing_type)}</Text>
         </View>
         <Text className="text-sm text-muted dark:text-muted-dark" numberOfLines={1}>
           {address}

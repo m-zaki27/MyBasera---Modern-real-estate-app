@@ -1,4 +1,4 @@
-import type { PropertyType } from '@/types/database';
+import type { ListingType, PropertyType } from '@/types/database';
 
 export const PROPERTY_TYPES: readonly PropertyType[] = [
   'House',
@@ -12,6 +12,14 @@ export const PROPERTY_TYPES: readonly PropertyType[] = [
 export type PropertyTypeFilter = PropertyType | 'All';
 
 export const PROPERTY_TYPE_FILTERS: readonly PropertyTypeFilter[] = ['All', ...PROPERTY_TYPES];
+
+export type ListingTypeFilter = ListingType | 'all';
+
+export const LISTING_TYPE_OPTIONS: readonly { key: ListingTypeFilter; label: string }[] = [
+  { key: 'all', label: 'Buy & rent' },
+  { key: 'sale', label: 'For sale' },
+  { key: 'rent', label: 'For rent' },
+];
 
 /** Facilities offered as filters; values match `properties.facilities` entries. */
 export const FACILITIES = [

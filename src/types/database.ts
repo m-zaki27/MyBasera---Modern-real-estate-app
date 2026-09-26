@@ -3,6 +3,8 @@
 
 export type PropertyType = 'House' | 'Apartment' | 'Villa' | 'Condo' | 'Townhouse' | 'Studio';
 
+export type ListingType = 'sale' | 'rent';
+
 export type Database = {
   public: {
     Tables: {
@@ -33,6 +35,7 @@ export type Database = {
           id: string;
           name: string;
           type: PropertyType;
+          listing_type: ListingType;
           price: number;
           address: string;
           latitude: number | null;
@@ -50,6 +53,7 @@ export type Database = {
           id?: string;
           name: string;
           type: PropertyType;
+          listing_type?: ListingType;
           price: number;
           address: string;
           latitude?: number | null;
@@ -126,7 +130,12 @@ export type Database = {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      is_own_agent: {
+        Args: { agent: string };
+        Returns: boolean;
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

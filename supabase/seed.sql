@@ -49,6 +49,15 @@ values
    'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80')
 on conflict (id) do nothing;
 
+-- Listings priced per month are rentals (listing_type defaults to 'sale').
+update public.properties
+set listing_type = 'rent'
+where id in (
+  'b0000000-0000-4000-8000-000000000002',
+  'b0000000-0000-4000-8000-000000000007',
+  'b0000000-0000-4000-8000-000000000011'
+);
+
 -- Sample reviews from placeholder users (real reviews will carry Clerk user IDs).
 insert into public.reviews (id, property_id, user_id, rating, comment) values
   ('c0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000001', 'seed_user_1', 5, 'Beautiful home in a quiet neighborhood. Sarah was fantastic to work with.'),

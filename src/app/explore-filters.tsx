@@ -8,13 +8,14 @@ import { Chip, FilterChips } from '@/components/filter-chips';
 import { PrimaryButton } from '@/components/primary-button';
 import {
   FACILITIES,
+  LISTING_TYPE_OPTIONS,
   MIN_ROOM_OPTIONS,
   PRICE_RANGES,
   PROPERTY_TYPE_FILTERS,
   SORT_OPTIONS,
 } from '@/constants/property';
 import { useProperties } from '@/hooks/use-properties';
-import { useExploreFiltersStore } from '@/store/explore-filters';
+import { selectExploreFilters, useExploreFiltersStore } from '@/store/explore-filters';
 
 type SectionProps = {
   title: string;
@@ -36,16 +37,7 @@ const roomLabel = (count: number) => (count === 0 ? 'Any' : `${count}+`);
 
 export default function ExploreFiltersScreen() {
   const insets = useSafeAreaInsets();
-  const filters = useExploreFiltersStore(
-    useShallow(({ type, priceRange, minBedrooms, minBathrooms, facilities, sort }) => ({
-      type,
-      priceRange,
-      minBedrooms,
-      minBathrooms,
-      facilities,
-      sort,
-    }))
-  );
+  const filters = useExploreFiltersStore(useShallow(selectExploreFilters));
   const setFilters = useExploreFiltersStore((state) => state.set);
   const toggleFacility = useExploreFiltersStore((state) => state.toggleFacility);
   const reset = useExploreFiltersStore((state) => state.reset);
@@ -63,6 +55,19 @@ export default function ExploreFiltersScreen() {
       </Text>
 
       <ScrollView contentContainerClassName="gap-7 py-4">
+        <Section title="Buy or rent">
+          <View className="flex-row flex-wrap gap-2 px-screen">
+            {LISTING_TYPE_OPTIONS.map((option) => (
+              <Chip
+                key={option.key}
+                label={option.label}
+                selected={filters.listingType === option.key}
+                onPress={() => setFilters({ listingType: option.key })}
+              />
+            ))}
+          </View>
+        </Section>
+
         <Section title="Property type">
           <FilterChips
             options={PROPERTY_TYPE_FILTERS}

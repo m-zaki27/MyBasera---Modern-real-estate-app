@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
 import type { Agent, Property, Review } from '@/types/database';
@@ -6,10 +7,10 @@ import type { Agent, Property, Review } from '@/types/database';
 // Reviews are only readable by signed-in users (RLS), so this query is also the
 // first one that depends on the Clerk → Supabase third-party auth integration.
 const DETAIL_SELECT =
-  '*, agent:agents(id, name, avatar, email, phone), reviews(id, rating, comment, created_at)' as const;
+  '*, agent:agents(id, name, avatar, email, phone, clerk_user_id), reviews(id, rating, comment, created_at)' as const;
 
 export type PropertyDetail = Property & {
-  agent: Pick<Agent, 'id' | 'name' | 'avatar' | 'email' | 'phone'> | null;
+  agent: Pick<Agent, 'id' | 'name' | 'avatar' | 'email' | 'phone' | 'clerk_user_id'> | null;
   reviews: Pick<Review, 'id' | 'rating' | 'comment' | 'created_at'>[];
 };
 
@@ -27,11 +28,15 @@ export function useProperty(id: string | undefined): UsePropertyResult {
   const [property, setProperty] = useState<PropertyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [attempt, setAttempt] = useState(0);
 
-  useEffect(() => {
+  const inFlightRef = useRef<AbortController | null>(null);
+
+  // Starts a fetch (cancelling any still in flight) and returns its cleanup.
+  const load = useCallback(() => {
     if (!id) return;
+    inFlightRef.current?.abort();
     const controller = new AbortController();
+    inFlightRef.current = controller;
 
     supabase
       .from('properties')
@@ -52,12 +57,15 @@ export function useProperty(id: string | undefined): UsePropertyResult {
       });
 
     return () => controller.abort();
-  }, [id, attempt]);
+  }, [id]);
+
+  // Refetch on focus too, so edits made on other screens show up when returning here.
+  useFocusEffect(load);
 
   const retry = useCallback(() => {
     setLoading(true);
-    setAttempt((count) => count + 1);
-  }, []);
+    load();
+  }, [load]);
 
   return { property, loading: Boolean(id) && loading, error, retry };
 }

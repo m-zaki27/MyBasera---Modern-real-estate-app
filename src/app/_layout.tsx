@@ -33,6 +33,14 @@ function RootNavigator() {
           <Stack.Screen name="property/[id]" />
           <Stack.Screen name="agent/[id]" />
           <Stack.Screen name="explore-filters" options={{ presentation: 'modal' }} />
+          <Stack.Screen
+            name="listing/new"
+            options={{ headerShown: true, title: 'New listing', headerBackTitle: 'Back' }}
+          />
+          <Stack.Screen
+            name="listing/[id]/edit"
+            options={{ headerShown: true, title: 'Edit listing', headerBackTitle: 'Back' }}
+          />
         </Stack.Protected>
         <Stack.Protected guard={!isSignedIn}>
           <Stack.Screen name="(auth)" />

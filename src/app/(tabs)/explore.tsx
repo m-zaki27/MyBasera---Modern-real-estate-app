@@ -13,7 +13,11 @@ import { SegmentedControl } from '@/components/segmented-control';
 import { colors } from '@/constants/colors';
 import { useAgents } from '@/hooks/use-agents';
 import { useProperties } from '@/hooks/use-properties';
-import { countActiveFilters, useExploreFiltersStore } from '@/store/explore-filters';
+import {
+  countActiveFilters,
+  selectExploreFilters,
+  useExploreFiltersStore,
+} from '@/store/explore-filters';
 
 type ExploreView = 'list' | 'map' | 'agents';
 
@@ -113,16 +117,7 @@ function AgentsView() {
 export default function ExploreScreen() {
   const [view, setView] = useState<ExploreView>('list');
 
-  const filters = useExploreFiltersStore(
-    useShallow(({ type, priceRange, minBedrooms, minBathrooms, facilities, sort }) => ({
-      type,
-      priceRange,
-      minBedrooms,
-      minBathrooms,
-      facilities,
-      sort,
-    }))
-  );
+  const filters = useExploreFiltersStore(useShallow(selectExploreFilters));
   const resetFilters = useExploreFiltersStore((state) => state.reset);
   const activeCount = countActiveFilters(filters);
 

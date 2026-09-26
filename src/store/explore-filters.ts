@@ -1,9 +1,15 @@
 import { create } from 'zustand';
 
-import type { MinRooms, PropertySort, PropertyTypeFilter } from '@/constants/property';
+import type {
+  ListingTypeFilter,
+  MinRooms,
+  PropertySort,
+  PropertyTypeFilter,
+} from '@/constants/property';
 
-type ExploreFilters = {
+export type ExploreFilters = {
   type: PropertyTypeFilter;
+  listingType: ListingTypeFilter;
   priceRange: string;
   minBedrooms: MinRooms;
   minBathrooms: MinRooms;
@@ -19,6 +25,7 @@ type ExploreFiltersState = ExploreFilters & {
 
 export const DEFAULT_EXPLORE_FILTERS: ExploreFilters = {
   type: 'All',
+  listingType: 'all',
   priceRange: 'any',
   minBedrooms: 0,
   minBathrooms: 0,
@@ -42,10 +49,17 @@ export const useExploreFiltersStore = create<ExploreFiltersState>()((set) => ({
   reset: () => set(DEFAULT_EXPLORE_FILTERS),
 }));
 
+/** Picks just the filter values; use with `useShallow` so unrelated store changes don't re-render. */
+export function selectExploreFilters(state: ExploreFiltersState): ExploreFilters {
+  const { type, listingType, priceRange, minBedrooms, minBathrooms, facilities, sort } = state;
+  return { type, listingType, priceRange, minBedrooms, minBathrooms, facilities, sort };
+}
+
 /** Number of filters that differ from the defaults (sort doesn't count), for badges. */
 export function countActiveFilters(filters: ExploreFilters): number {
   return (
     Number(filters.type !== DEFAULT_EXPLORE_FILTERS.type) +
+    Number(filters.listingType !== DEFAULT_EXPLORE_FILTERS.listingType) +
     Number(filters.priceRange !== DEFAULT_EXPLORE_FILTERS.priceRange) +
     Number(filters.minBedrooms !== DEFAULT_EXPLORE_FILTERS.minBedrooms) +
     Number(filters.minBathrooms !== DEFAULT_EXPLORE_FILTERS.minBathrooms) +

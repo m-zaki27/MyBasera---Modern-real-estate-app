@@ -42,18 +42,18 @@ function boundsFor(points: LocatedProperty[]): LngLatBounds {
 }
 
 type PricePinProps = {
-  price: number;
+  property: LocatedProperty;
   selected: boolean;
 };
 
-function PricePin({ price, selected }: PricePinProps) {
+function PricePin({ property, selected }: PricePinProps) {
   return (
     <View
       className={`rounded-full border px-2.5 py-1 ${
         selected ? 'border-primary bg-primary' : 'border-border bg-background'
       }`}>
       <Text className={`text-xs font-bold ${selected ? 'text-white' : 'text-foreground'}`}>
-        {formatCompactPrice(price)}
+        {formatCompactPrice(property.price, property.listing_type)}
       </Text>
     </View>
   );
@@ -98,7 +98,7 @@ export function MapLibrePropertyMap({ properties }: PropertyMapProps) {
             lngLat={[property.longitude, property.latitude]}
             anchor="center"
             onPress={() => setSelectedId(property.id)}>
-            <PricePin price={property.price} selected={property.id === selectedId} />
+            <PricePin property={property} selected={property.id === selectedId} />
           </Marker>
         ))}
       </MapLibreMap>

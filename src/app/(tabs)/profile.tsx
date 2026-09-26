@@ -3,12 +3,22 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormField } from '@/components/form-field';
+import { MyListingRow } from '@/components/my-listing-row';
 import { PrimaryButton } from '@/components/primary-button';
 import { colors } from '@/constants/colors';
+import { useMyListings } from '@/hooks/use-my-listings';
 import { getClerkErrorMessage } from '@/lib/clerk-errors';
 import { formatDate } from '@/lib/format';
 import { useFavoritesStore } from '@/store/favorites';
@@ -22,6 +32,7 @@ export default function ProfileScreen() {
   const { user } = useUser();
   const { signOut } = useClerk();
   const favoriteCount = useFavoritesStore((state) => Object.keys(state.ids).length);
+  const myListings = useMyListings();
 
   const [firstName, setFirstName] = useState(user?.firstName ?? '');
   const [lastName, setLastName] = useState(user?.lastName ?? '');
@@ -118,6 +129,28 @@ export default function ProfileScreen() {
                 size={18}
               />
             </Pressable>
+
+            <View className="gap-3">
+              <Text className="text-lg font-bold text-foreground dark:text-foreground-dark">
+                My listings
+              </Text>
+              {myListings.loading ? (
+                <ActivityIndicator color={colors.primary.DEFAULT} />
+              ) : myListings.error ? (
+                <Text className="text-sm text-danger-text dark:text-danger-text-dark">
+                  {myListings.error}
+                </Text>
+              ) : myListings.listings.length === 0 ? (
+                <Text className="text-sm text-muted dark:text-muted-dark">
+                  You haven&apos;t listed a property yet.
+                </Text>
+              ) : (
+                myListings.listings.map((listing) => (
+                  <MyListingRow key={listing.id} listing={listing} />
+                ))
+              )}
+              <PrimaryButton title="List a property" onPress={() => router.push('/listing/new')} />
+            </View>
 
             <View className="gap-4">
               <Text className="text-lg font-bold text-foreground dark:text-foreground-dark">

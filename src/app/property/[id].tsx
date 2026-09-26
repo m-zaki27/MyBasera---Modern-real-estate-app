@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
+import { useAuth } from '@clerk/expo';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
 import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from 'react-native';
@@ -20,6 +21,7 @@ import { getMapsUrl } from '@/lib/maps';
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { property, loading, error, retry } = useProperty(id);
+  const { userId } = useAuth();
   const insets = useSafeAreaInsets();
 
   if (loading) {
@@ -55,6 +57,7 @@ export default function PropertyDetailsScreen() {
   }
 
   const reviewCount = property.reviews.length;
+  const isOwnListing = Boolean(userId) && property.agent?.clerk_user_id === userId;
 
   return (
     <View className="flex-1 bg-background dark:bg-background-dark">
@@ -85,17 +88,24 @@ export default function PropertyDetailsScreen() {
                   {property.type}
                 </Text>
               </View>
+              <View className="rounded-full border border-border px-3 py-1 dark:border-border-dark">
+                <Text className="text-xs font-semibold text-foreground dark:text-foreground-dark">
+                  {property.listing_type === 'rent' ? 'For rent' : 'For sale'}
+                </Text>
+              </View>
               <View
                 className="flex-row items-center gap-1"
                 accessible
-                accessibilityLabel={`Rated ${property.rating.toFixed(1)} out of 5`}>
+                accessibilityLabel={
+                  property.rating > 0 ? `Rated ${property.rating.toFixed(1)} out of 5` : 'New listing'
+                }>
                 <SymbolView
                   name={{ ios: 'star.fill', android: 'star', web: 'star' }}
                   tintColor={colors.rating.DEFAULT}
                   size={14}
                 />
                 <Text className="text-sm font-semibold text-foreground dark:text-foreground-dark">
-                  {property.rating.toFixed(1)}
+                  {property.rating > 0 ? property.rating.toFixed(1) : 'New'}
                 </Text>
                 <Text className="text-sm text-muted dark:text-muted-dark">
                   ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
@@ -105,7 +115,7 @@ export default function PropertyDetailsScreen() {
             <Text className="text-2xl font-bold text-foreground dark:text-foreground-dark">
               {property.name}
             </Text>
-            <Text className="text-2xl font-bold text-primary">{formatPrice(property.price)}</Text>
+            <Text className="text-2xl font-bold text-primary">{formatPrice(property.price, property.listing_type)}</Text>
             <Pressable
               onPress={() => Linking.openURL(getMapsUrl({ label: property.name, ...property }))}
               accessibilityRole="link"
@@ -121,6 +131,16 @@ export default function PropertyDetailsScreen() {
               </Text>
             </Pressable>
           </View>
+
+          {isOwnListing ? (
+            <PrimaryButton
+              title="Edit listing"
+              variant="outline"
+              onPress={() =>
+                router.push({ pathname: '/listing/[id]/edit', params: { id: property.id } })
+              }
+            />
+          ) : null}
 
           <PropertySpecs
             bedrooms={property.bedrooms}

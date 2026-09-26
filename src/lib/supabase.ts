@@ -22,7 +22,11 @@ if (!supabaseUrl || !supabaseKey) {
  */
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   async accessToken() {
-    const clerk = getClerkInstance({ publishableKey: clerkPublishableKey });
-    return (await clerk.session?.getToken()) ?? null;
+    // On web, getClerkInstance() returns undefined until ClerkProvider has mounted
+    // (Supabase asks for a token as soon as the client is created), despite its type.
+    const clerk = getClerkInstance({ publishableKey: clerkPublishableKey }) as
+      | ReturnType<typeof getClerkInstance>
+      | undefined;
+    return (await clerk?.session?.getToken()) ?? null;
   },
 });

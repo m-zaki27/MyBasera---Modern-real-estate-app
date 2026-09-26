@@ -1,20 +1,38 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import type { PropertyTypeFilter } from '@/constants/property';
+import { PRICE_RANGES, type PropertySort, type PropertyTypeFilter } from '@/constants/property';
 import { supabase } from '@/lib/supabase';
 import type { Property } from '@/types/database';
 
 export const LIST_COLUMNS =
-  'id, name, type, price, address, bedrooms, bathrooms, area, rating, image_url' as const;
+  'id, name, type, price, address, latitude, longitude, bedrooms, bathrooms, area, rating, image_url' as const;
 
 export type PropertyListItem = Pick<
   Property,
-  'id' | 'name' | 'type' | 'price' | 'address' | 'bedrooms' | 'bathrooms' | 'area' | 'rating' | 'image_url'
+  | 'id'
+  | 'name'
+  | 'type'
+  | 'price'
+  | 'address'
+  | 'latitude'
+  | 'longitude'
+  | 'bedrooms'
+  | 'bathrooms'
+  | 'area'
+  | 'rating'
+  | 'image_url'
 >;
 
-type PropertyFilters = {
-  query: string;
-  type: PropertyTypeFilter;
+export type PropertyFilters = {
+  query?: string;
+  type?: PropertyTypeFilter;
+  /** Key from PRICE_RANGES. */
+  priceRange?: string;
+  minBedrooms?: number;
+  minBathrooms?: number;
+  /** Listing must have all of these. */
+  facilities?: readonly string[];
+  sort?: PropertySort;
 };
 
 type UsePropertiesResult = {
@@ -31,31 +49,58 @@ function toSearchTerm(query: string): string {
   return query.replace(/[,()*%\\]/g, ' ').trim();
 }
 
-export function useProperties({ query, type }: PropertyFilters): UsePropertiesResult {
+export function useProperties({
+  query = '',
+  type = 'All',
+  priceRange = 'any',
+  minBedrooms = 0,
+  minBathrooms = 0,
+  facilities = [],
+  sort = 'rating',
+}: PropertyFilters): UsePropertiesResult {
   const [properties, setProperties] = useState<PropertyListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadCount, setReloadCount] = useState(0);
 
+  // Stable primitive for the effect deps (arrays are new on every render).
+  const facilitiesKey = [...facilities].sort().join('|');
+
   useEffect(() => {
     const controller = new AbortController();
 
-    let request = supabase
-      .from('properties')
-      .select(LIST_COLUMNS)
-      .order('rating', { ascending: false })
-      .order('name')
-      .abortSignal(controller.signal);
+    let request = supabase.from('properties').select(LIST_COLUMNS).abortSignal(controller.signal);
 
-    if (type !== 'All') {
-      request = request.eq('type', type);
-    }
+    if (type !== 'All') request = request.eq('type', type);
 
     const term = toSearchTerm(query);
-    if (term) {
-      request = request.or(`name.ilike.*${term}*,address.ilike.*${term}*`);
+    if (term) request = request.or(`name.ilike.*${term}*,address.ilike.*${term}*`);
+
+    const range = PRICE_RANGES.find((option) => option.key === priceRange);
+    if (range?.min !== undefined) request = request.gte('price', range.min);
+    if (range?.max !== undefined) request = request.lt('price', range.max);
+
+    if (minBedrooms > 0) request = request.gte('bedrooms', minBedrooms);
+    if (minBathrooms > 0) request = request.gte('bathrooms', minBathrooms);
+
+    const requiredFacilities = facilitiesKey ? facilitiesKey.split('|') : [];
+    if (requiredFacilities.length > 0) request = request.contains('facilities', requiredFacilities);
+
+    switch (sort) {
+      case 'price_asc':
+        request = request.order('price', { ascending: true });
+        break;
+      case 'price_desc':
+        request = request.order('price', { ascending: false });
+        break;
+      case 'newest':
+        request = request.order('created_at', { ascending: false });
+        break;
+      default:
+        request = request.order('rating', { ascending: false });
     }
+    request = request.order('name');
 
     request.then(({ data, error: queryError }) => {
       if (controller.signal.aborted) return;
@@ -70,7 +115,7 @@ export function useProperties({ query, type }: PropertyFilters): UsePropertiesRe
     });
 
     return () => controller.abort();
-  }, [query, type, reloadCount]);
+  }, [query, type, priceRange, minBedrooms, minBathrooms, facilitiesKey, sort, reloadCount]);
 
   const refresh = useCallback(() => {
     setRefreshing(true);

@@ -29,6 +29,7 @@ function RootNavigator() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="property/[id]" />
           <Stack.Screen name="agent/[id]" />
+          <Stack.Screen name="explore-filters" options={{ presentation: 'modal' }} />
         </Stack.Protected>
         <Stack.Protected guard={!isSignedIn}>
           <Stack.Screen name="(auth)" />

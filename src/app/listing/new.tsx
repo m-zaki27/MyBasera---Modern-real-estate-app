@@ -13,12 +13,13 @@ export default function NewListingScreen() {
   const onSubmit = async ({ values, photo }: ListingSubmission) => {
     if (!user) throw new Error('You need to be signed in to post a listing.');
 
-    const email = user.primaryEmailAddress?.emailAddress ?? null;
-    // First listing: this creates the user's agent profile from their Clerk account.
+    const loginEmail = user.primaryEmailAddress?.emailAddress;
+    // First listing: this creates the user's public agent profile. Their login email is
+    // NOT copied onto it — contact details are opt-in (Edit profile → Contact details).
     const agentId = await ensureOwnAgent({
       clerkUserId: user.id,
-      name: user.fullName || email?.split('@')[0] || 'New agent',
-      email,
+      name: user.fullName || loginEmail?.split('@')[0] || 'New agent',
+      email: null,
       avatar: user.hasImage ? user.imageUrl : null,
     });
 

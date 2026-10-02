@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 
+import { AgentContactForm } from '@/components/agent-contact-form';
 import { FormField } from '@/components/form-field';
 import { PrimaryButton } from '@/components/primary-button';
 import { ProfileAvatar } from '@/components/profile-avatar';
@@ -66,6 +67,9 @@ export default function EditProfileScreen() {
             <Text className="text-sm text-danger-text dark:text-danger-text-dark">{error}</Text>
           ) : null}
           <PrimaryButton title="Save" onPress={onSave} loading={saving} disabled={!nameChanged} />
+
+          <View className="h-px bg-border dark:bg-border-dark" />
+          <AgentContactForm />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

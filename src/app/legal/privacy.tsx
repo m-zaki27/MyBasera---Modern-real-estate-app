@@ -24,8 +24,10 @@ export default function PrivacyPolicyScreen() {
 
       <InfoSection title="Who can see what">
         <InfoText>
-          Listings, agent profiles and reviews are public. Messages are visible only to the two
-          people in the conversation. Favorites and deals are visible only to the people involved.
+          Listings, reviews, and agents’ names and photos are public. Your login email is never
+          shown on your listings; contact email and phone appear only if you add them in Edit
+          profile, and only to signed-in users. Messages are visible only to the two people in
+          the conversation. Favorites and deals are visible only to the people involved.
         </InfoText>
       </InfoSection>
 

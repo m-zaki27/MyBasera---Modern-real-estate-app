@@ -197,13 +197,6 @@ supabase/
 > [!NOTE]
 > Map tiles come from OpenStreetMap's community servers. For high-traffic production use, switch to a commercial OSM tile provider in [`src/lib/leaflet-html.ts`](src/lib/leaflet-html.ts).
 
-## 🛣️ Roadmap
-
-- [ ] Push notifications for new messages and offers
-- [ ] Multiple photos per listing
-- [ ] Saved searches and alerts
-- [ ] Urdu localization
-- [ ] Production builds on Google Play and the App Store
 
 ## 🤝 Contributing
 

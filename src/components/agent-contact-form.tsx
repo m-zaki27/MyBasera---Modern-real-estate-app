@@ -60,7 +60,7 @@ export function AgentContactForm() {
       return;
     }
     if (trimmedPhone && !PHONE_PATTERN.test(trimmedPhone)) {
-      setMessage({ tone: 'error', text: 'Enter a valid phone number (e.g. +92 300 0000001), or leave it empty.' });
+      setMessage({ tone: 'error', text: 'Enter a valid phone number (e.g. +92 300 0000000), or leave it empty.' });
       return;
     }
     setSaving(true);
@@ -101,7 +101,7 @@ export function AgentContactForm() {
         onChangeText={setPhone}
         keyboardType="phone-pad"
         autoComplete="tel"
-        placeholder="+92 300 0000001"
+        placeholder="+92 300 0000000"
       />
       {message ? (
         <Text

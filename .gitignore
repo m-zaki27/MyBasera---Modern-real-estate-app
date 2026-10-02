@@ -43,3 +43,8 @@ example
 # generated native folders
 /ios
 /android
+
+# AI-assistant instruction files (kept locally, not published)
+AGENTS.md
+CLAUDE.md
+.claude/

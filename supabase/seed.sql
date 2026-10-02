@@ -1,4 +1,5 @@
--- Development seed data (Pakistan, prices in PKR). Safe to re-run: fixed IDs + `on conflict do nothing`.
+-- Development seed data (Pakistan, prices in PKR). Agents are fictional: example.com
+-- emails and placeholder +92 300 000000x phone numbers. Safe to re-run: fixed IDs + `on conflict do nothing`.
 -- Photos are hot-linked placeholders; listings created in the app upload to Supabase Storage.
 
 insert into public.agents (id, name, avatar, email, phone) values

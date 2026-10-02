@@ -1,56 +1,133 @@
-# Welcome to your Expo app 👋
+<p align="center">
+  <img src="assets/images/logo.png" alt="MyBasera logo" width="96" />
+</p>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<h1 align="center">MyBasera</h1>
 
-## Get started
+<p align="center">Find your basera — homes to buy and rent across Pakistan.</p>
 
-1. Install dependencies
+MyBasera is a real-estate listings app built with Expo (React Native). Browse and filter
+homes, see them on a map, chat with agents, negotiate offers, and close deals with a
+confirmed record on both sides. Prices are in PKR.
 
-   ```bash
-   npm install
-   ```
+## Features
 
-2. Start the app
+- **Browse & search** — listings with search by area/city/name, property-type chips, and
+  advanced filters (buy/rent, PKR price bands, bedrooms, bathrooms, facilities, sort).
+- **Map** — OpenStreetMap via Leaflet; listing location preview and a full-screen map with
+  an “Open in Google Maps” link.
+- **Listings** — anyone can list a property with a photo (Supabase Storage), map
+  coordinates (or “use my current location”), and facilities; owners can edit, delete,
+  mark as sold, or relist.
+- **Chat** — realtime messaging between buyers/tenants and agents.
+- **Deals** — offer → counter → accept → both sides confirm completion; listings move to
+  *Under offer* → *Sold/Rented*. Reviews are allowed only after a completed deal. Rentals
+  link to the official provincial police tenant-registration services.
+- **Favorites**, **profile** (photo upload, appearance, help, about), and account deletion.
 
-   ```bash
-   npx expo start
-   ```
+## Tech stack
 
-In the output, you'll find options to open the app in a
+| Area | Choice |
+| --- | --- |
+| App | [Expo](https://expo.dev) SDK 57, React Native, TypeScript, Expo Router |
+| Styling | NativeWind (Tailwind CSS), Reanimated animations |
+| Auth | [Clerk](https://clerk.com) (email + password) |
+| Backend | [Supabase](https://supabase.com) — Postgres with Row Level Security, Storage, Realtime |
+| State | Zustand (client-only UI state) |
+| Maps | Leaflet + OpenStreetMap tiles in `react-native-webview` |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Getting started
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Prerequisites
 
-## Get a fresh project
+- Node.js 20+ and npm
+- A free [Supabase](https://supabase.com) project and a free [Clerk](https://clerk.com) application
+- The [Expo Go](https://expo.dev/go) app on your phone (SDK 57), or a simulator
 
-When you're ready, run:
+### 1. Install
 
 ```bash
-npm run reset-project
+git clone <your-repo-url> mybasera
+cd mybasera
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configure environment variables
 
-### Other setup steps
+```bash
+cp .env.example .env.local
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Fill in `.env.local` with your **publishable** keys only (they're bundled into the app):
 
-## Learn more
+| Variable | Where to find it |
+| --- | --- |
+| `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk Dashboard → API Keys |
+| `EXPO_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API |
+| `EXPO_PUBLIC_SUPABASE_KEY` | Supabase → Project Settings → API (publishable / anon key) |
 
-To learn more about developing your project with Expo, look at the following resources:
+Never put a Clerk secret key or a Supabase service-role / secret key in this app.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 3. Set up the database
 
-## Join the community
+Run every file in [`supabase/migrations/`](supabase/migrations) **in filename order** — either
+paste each into the Supabase SQL Editor, or link the project with the Supabase CLI and run
+`supabase db push`. Then, optionally, run [`supabase/seed.sql`](supabase/seed.sql) for demo
+listings (fictional agents and placeholder contact details).
 
-Join our community of developers creating universal apps.
+### 4. Connect Clerk and Supabase
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+MyBasera uses Supabase's native third-party auth with Clerk, so database rules can check the
+signed-in user:
+
+1. In Clerk, activate the Supabase integration (Dashboard → `setup/supabase`) and copy your
+   Clerk domain.
+2. In Supabase, go to **Authentication → Sign In / Providers → Third-Party Auth**, add
+   **Clerk**, and paste the domain.
+3. In Clerk, enable **Email address** + **Password** sign-in.
+
+### 5. Run
+
+```bash
+npx expo start --clear
+```
+
+Scan the QR code with Expo Go (Android) or the Camera app (iOS), or press `a` / `i` / `w`
+for Android, iOS or web.
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm start` | Start the Expo dev server |
+| `npm run android` / `ios` / `web` | Start and open a platform |
+| `npm run lint` | Lint with ESLint (`eslint-config-expo`) |
+| `npx tsc --noEmit` | Type-check |
+
+## Project structure
+
+```
+src/
+  app/          Expo Router screens ((auth), (tabs), property, deal, chat, …)
+  components/   Reusable UI components
+  constants/    Design tokens, brand, static data
+  hooks/        Data hooks wrapping Supabase queries
+  lib/          Supabase client, API helpers, formatting
+  store/        Zustand stores
+  types/        Database types
+supabase/
+  migrations/   SQL migrations — the source of truth for the schema
+  seed.sql      Demo data
+```
+
+## Security
+
+- All tables use Row Level Security; private data (chats, deals, favorites) is visible only
+  to the people involved, and deal changes go through checked database functions.
+- Only publishable keys live in the app. `.env*` files are git-ignored.
+- Map tiles come from OpenStreetMap's community servers; for high-traffic production use,
+  switch to a commercial OSM tile provider (see `src/lib/leaflet-html.ts`).
+
+## License
+
+[MIT](LICENSE) © 2026 Zaki

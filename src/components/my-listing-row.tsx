@@ -3,6 +3,7 @@ import { Link } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { Pressable, Text, View } from 'react-native';
 
+import { StatusBadge } from '@/components/status-badge';
 import { colors } from '@/constants/colors';
 import type { PropertyListItem } from '@/hooks/use-properties';
 import { formatPrice } from '@/lib/format';
@@ -38,6 +39,7 @@ export function MyListingRow({ listing }: MyListingRowProps) {
             {listing.address}
           </Text>
         </View>
+        <StatusBadge status={listing.status} />
         <SymbolView
           name={{ ios: 'pencil', android: 'edit', web: 'edit' }}
           tintColor={colors.muted.DEFAULT}

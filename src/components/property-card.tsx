@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 
 import { FavoriteButton } from '@/components/favorite-button';
 import { PropertySpecs } from '@/components/property-specs';
+import { StatusBadge } from '@/components/status-badge';
 import { colors } from '@/constants/colors';
 import type { PropertyListItem } from '@/hooks/use-properties';
 import { formatPrice } from '@/lib/format';
@@ -13,7 +14,7 @@ type PropertyCardProps = {
 };
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const { id, name, type, listing_type, price, address, bedrooms, bathrooms, area, rating, image_url } =
+  const { id, name, type, listing_type, status, price, address, bedrooms, bathrooms, area, rating, image_url } =
     property;
 
   return (
@@ -43,6 +44,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
         </View>
         <View className="absolute right-3 top-3">
           <FavoriteButton propertyId={id} propertyName={name} />
+        </View>
+        <View className="absolute bottom-3 left-3">
+          <StatusBadge status={status} />
         </View>
       </View>
 

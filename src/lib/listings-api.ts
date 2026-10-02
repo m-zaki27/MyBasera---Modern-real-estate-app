@@ -21,6 +21,8 @@ export type ListingValues = Pick<
   | 'area'
   | 'facilities'
   | 'image_url'
+  | 'latitude'
+  | 'longitude'
 >;
 
 /**

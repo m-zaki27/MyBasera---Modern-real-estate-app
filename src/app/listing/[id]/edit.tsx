@@ -108,6 +108,8 @@ export default function EditListingScreen() {
           area: property.area,
           facilities: property.facilities,
           imageUrl: property.image_url,
+          latitude: property.latitude,
+          longitude: property.longitude,
         }}
         submitLabel="Save changes"
         onSubmit={onSubmit}

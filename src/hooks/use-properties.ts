@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase';
 import type { Property } from '@/types/database';
 
 export const LIST_COLUMNS =
-  'id, name, type, listing_type, price, address, latitude, longitude, bedrooms, bathrooms, area, rating, image_url' as const;
+  'id, name, type, listing_type, status, price, address, latitude, longitude, bedrooms, bathrooms, area, rating, image_url' as const;
 
 export type PropertyListItem = Pick<
   Property,
@@ -19,6 +19,7 @@ export type PropertyListItem = Pick<
   | 'name'
   | 'type'
   | 'listing_type'
+  | 'status'
   | 'price'
   | 'address'
   | 'latitude'
@@ -83,7 +84,12 @@ export function useProperties({
     const controller = new AbortController();
     inFlightRef.current = controller;
 
-    let request = supabase.from('properties').select(LIST_COLUMNS).abortSignal(controller.signal);
+    // Browsing shows listings that are available or under offer (sold/rented are hidden).
+    let request = supabase
+      .from('properties')
+      .select(LIST_COLUMNS)
+      .in('status', ['active', 'under_offer'])
+      .abortSignal(controller.signal);
 
     if (type !== 'All') request = request.eq('type', type);
     if (listingType !== 'all') request = request.eq('listing_type', listingType);

@@ -1,22 +1,24 @@
-import { Image } from 'expo-image';
 import { useAuth } from '@clerk/expo';
+import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
-import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AgentCard } from '@/components/agent-card';
 import { BackButton } from '@/components/back-button';
 import { FavoriteButton } from '@/components/favorite-button';
+import { ListingDealActions } from '@/components/listing-deal-actions';
+import { LocationPreview } from '@/components/location-preview';
 import { PrimaryButton } from '@/components/primary-button';
 import { PropertySpecs } from '@/components/property-specs';
 import { ReviewItem } from '@/components/review-item';
 import { ScreenMessage } from '@/components/screen-message';
+import { StatusBadge } from '@/components/status-badge';
 import { colors } from '@/constants/colors';
 import { useProperty } from '@/hooks/use-property';
 import { formatPrice } from '@/lib/format';
-import { getMapsUrl } from '@/lib/maps';
 
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -93,6 +95,7 @@ export default function PropertyDetailsScreen() {
                   {property.listing_type === 'rent' ? 'For rent' : 'For sale'}
                 </Text>
               </View>
+              <StatusBadge status={property.status} />
               <View
                 className="flex-row items-center gap-1"
                 accessible
@@ -117,9 +120,9 @@ export default function PropertyDetailsScreen() {
             </Text>
             <Text className="text-2xl font-bold text-primary">{formatPrice(property.price, property.listing_type)}</Text>
             <Pressable
-              onPress={() => Linking.openURL(getMapsUrl({ label: property.name, ...property }))}
+              onPress={() => router.push({ pathname: '/map/[id]', params: { id: property.id } })}
               accessibilityRole="link"
-              accessibilityHint="Opens the address in your maps app"
+              accessibilityHint="Opens the full-screen map"
               className="flex-row items-center gap-1.5 self-start">
               <SymbolView
                 name={{ ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' }}
@@ -131,6 +134,15 @@ export default function PropertyDetailsScreen() {
               </Text>
             </Pressable>
           </View>
+
+          {!isOwnListing ? (
+            <ListingDealActions
+              propertyId={property.id}
+              listingType={property.listing_type}
+              status={property.status}
+              agent={property.agent}
+            />
+          ) : null}
 
           {isOwnListing ? (
             <PrimaryButton
@@ -166,6 +178,13 @@ export default function PropertyDetailsScreen() {
               </View>
             </View>
           ) : null}
+
+          <LocationPreview
+            propertyId={property.id}
+            address={property.address}
+            latitude={property.latitude}
+            longitude={property.longitude}
+          />
 
           {property.agent ? (
             <View className="gap-3">

@@ -1,4 +1,5 @@
 import { useUser } from '@clerk/expo';
+import { Image } from 'expo-image';
 import type { ReactElement } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +8,7 @@ import { FilterChips } from '@/components/filter-chips';
 import { PrimaryButton } from '@/components/primary-button';
 import { PropertyCardLink } from '@/components/property-card-link';
 import { SearchBar } from '@/components/search-bar';
+import { APP_NAME } from '@/constants/brand';
 import { colors } from '@/constants/colors';
 import { PROPERTY_TYPE_FILTERS } from '@/constants/property';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
@@ -32,12 +34,21 @@ export default function HomeScreen() {
 
   const header = (
     <View className="gap-4 pb-4">
-      <View className="gap-1 px-screen pt-2">
+      <View className="flex-row items-center gap-2.5 px-screen pt-2">
+        <Image
+          source={require('@/assets/images/logo.png')}
+          className="h-9 w-9"
+          contentFit="contain"
+          accessibilityLabel={`${APP_NAME} logo`}
+        />
+        <Text className="text-xl font-bold text-foreground dark:text-foreground-dark">{APP_NAME}</Text>
+      </View>
+      <View className="gap-1 px-screen">
         <Text className="text-sm text-muted dark:text-muted-dark">
           {greetingName ? `Hi, ${greetingName}` : 'Welcome'}
         </Text>
         <Text className="text-2xl font-bold text-foreground dark:text-foreground-dark">
-          Find your next home
+          Find your basera
         </Text>
       </View>
       <View className="px-screen">

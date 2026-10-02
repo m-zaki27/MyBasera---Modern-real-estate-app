@@ -1,19 +1,17 @@
 {
   "expo": {
-    "name": "real-estate-app",
-    "slug": "real-estate-app",
+    "name": "MyBasera",
+    "slug": "mybasera",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "realestateapp",
+    "scheme": "mybasera",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
+    "ios": {},
     "android": {
       "package": "com.MyBasera",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#12404A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -29,17 +27,26 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 160,
+          "backgroundColor": "#FCEFE1",
+          "dark": {
+            "image": "./assets/images/splash-icon.png",
+            "backgroundColor": "#0F3A42"
+          }
         }
       ],
-      "@maplibre/maplibre-react-native",
       [
         "expo-image-picker",
         {
           "photosPermission": "MyBasera needs access to your photos so you can add pictures to your listings.",
           "cameraPermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "MyBasera uses your location to fill in a property’s map coordinates when you list it."
         }
       ]
     ],

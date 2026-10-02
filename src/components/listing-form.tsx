@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CoordinatesField, parseCoordinates } from '@/components/coordinates-field';
 import { Chip } from '@/components/filter-chips';
 import { FormField } from '@/components/form-field';
 import { PhotoField, type PhotoValue } from '@/components/photo-field';
@@ -21,6 +22,8 @@ export type ListingFormInitial = {
   area: number | null;
   facilities: string[];
   imageUrl: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 export const EMPTY_LISTING: ListingFormInitial = {
@@ -34,6 +37,8 @@ export const EMPTY_LISTING: ListingFormInitial = {
   area: null,
   facilities: [],
   imageUrl: null,
+  latitude: null,
+  longitude: null,
 };
 
 export type ListingSubmission = {
@@ -49,7 +54,9 @@ type ListingFormProps = {
   footer?: ReactNode;
 };
 
-type FieldErrors = Partial<Record<'name' | 'price' | 'address' | 'bedrooms' | 'bathrooms' | 'area', string>>;
+type FieldErrors = Partial<
+  Record<'name' | 'price' | 'address' | 'bedrooms' | 'bathrooms' | 'area' | 'coordinates', string>
+>;
 
 const LISTING_TYPES: readonly { key: ListingType; label: string }[] = [
   { key: 'sale', label: 'For sale' },
@@ -60,7 +67,7 @@ const toText = (value: number | null) => (value === null ? '' : String(value));
 
 /** Parses a whole, non-negative number from a text field; null when empty, NaN when invalid. */
 function parseWholeNumber(text: string): number | null {
-  const cleaned = text.replace(/[,\s$]/g, '');
+  const cleaned = text.replace(/[,\s]/g, '');
   if (cleaned === '') return null;
   return /^\d+$/.test(cleaned) ? Number(cleaned) : Number.NaN;
 }
@@ -100,6 +107,8 @@ export function ListingForm({ initial, submitLabel, onSubmit, footer }: ListingF
   const [bathrooms, setBathrooms] = useState(String(initial.bathrooms));
   const [area, setArea] = useState(toText(initial.area));
   const [facilities, setFacilities] = useState<string[]>(initial.facilities);
+  const [latitude, setLatitude] = useState(toText(initial.latitude));
+  const [longitude, setLongitude] = useState(toText(initial.longitude));
   const [photo, setPhoto] = useState<PhotoValue>(
     initial.imageUrl ? { kind: 'existing', url: initial.imageUrl } : { kind: 'none' }
   );
@@ -123,12 +132,19 @@ export function ListingForm({ initial, submitLabel, onSubmit, footer }: ListingF
     if (!name.trim()) nextErrors.name = 'Give the listing a name.';
     if (!address.trim()) nextErrors.address = 'Add the address.';
     if (parsedPrice === null || Number.isNaN(parsedPrice) || parsedPrice <= 0) {
-      nextErrors.price = 'Enter a price in whole dollars.';
+      nextErrors.price = 'Enter the price in rupees (numbers only).';
     }
     if (parsedBedrooms === null || Number.isNaN(parsedBedrooms)) nextErrors.bedrooms = 'Enter a number.';
     if (parsedBathrooms === null || Number.isNaN(parsedBathrooms)) nextErrors.bathrooms = 'Enter a number.';
     if (parsedArea !== null && (Number.isNaN(parsedArea) || parsedArea <= 0)) {
       nextErrors.area = 'Enter the area in square feet, or leave it empty.';
+    }
+    // Coordinates are optional, but if either is filled in, both must be valid.
+    const hasCoordinates = latitude.trim() !== '' || longitude.trim() !== '';
+    const coordinates = parseCoordinates(latitude, longitude);
+    if (hasCoordinates && !coordinates) {
+      nextErrors.coordinates =
+        'Enter both latitude (−90 to 90) and longitude (−180 to 180) as decimal numbers, or leave both empty.';
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -147,6 +163,8 @@ export function ListingForm({ initial, submitLabel, onSubmit, footer }: ListingF
           bathrooms: parsedBathrooms as number,
           area: parsedArea,
           facilities,
+          latitude: coordinates?.latitude ?? null,
+          longitude: coordinates?.longitude ?? null,
         },
         photo,
       });
@@ -176,12 +194,26 @@ export function ListingForm({ initial, submitLabel, onSubmit, footer }: ListingF
               label="Address"
               value={address}
               onChangeText={setAddress}
-              placeholder="123 Main Street, Austin, TX"
+              placeholder="House 12, Street 4, DHA Phase 6, Lahore"
               autoComplete="street-address"
               textContentType="fullStreetAddress"
             />
             <FieldError message={errors.address} />
           </View>
+        </Section>
+
+        <Section title="Map location">
+          <CoordinatesField
+            latitude={latitude}
+            longitude={longitude}
+            onChange={(lat, lng) => {
+              setLatitude(lat);
+              setLongitude(lng);
+              // Drop a stale "enter both coordinates" error as soon as they change.
+              setErrors((current) => ({ ...current, coordinates: undefined }));
+            }}
+            error={errors.coordinates}
+          />
         </Section>
 
         <Section title="Buy or rent">
@@ -197,11 +229,11 @@ export function ListingForm({ initial, submitLabel, onSubmit, footer }: ListingF
           </View>
           <View className="gap-1">
             <FormField
-              label={listingType === 'rent' ? 'Monthly rent (USD)' : 'Price (USD)'}
+              label={listingType === 'rent' ? 'Monthly rent (PKR)' : 'Price (PKR)'}
               value={price}
               onChangeText={setPrice}
               keyboardType="number-pad"
-              placeholder={listingType === 'rent' ? '2500' : '450000'}
+              placeholder={listingType === 'rent' ? '85000' : '25000000'}
             />
             <FieldError message={errors.price} />
           </View>

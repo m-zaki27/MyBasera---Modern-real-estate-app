@@ -1,29 +1,35 @@
 import type { ListingType } from '@/types/database';
 
-const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
-
 const numberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
+const LAKH = 100_000;
+const CRORE = 10_000_000;
+
+/** Up to two decimals, without trailing zeros: 6.5, 1.25, 45. */
+function trimDecimals(value: number): string {
+  return String(Number(value.toFixed(2)));
+}
+
+/**
+ * Prices in Pakistani rupees, the way Pakistani property listings show them:
+ * "PKR 6.5 Crore", "PKR 45 Lakh", "PKR 85,000/mo".
+ */
 export function formatPrice(price: number, listingType: ListingType = 'sale'): string {
-  const formatted = currencyFormatter.format(price);
-  return listingType === 'rent' ? `${formatted}/mo` : formatted;
+  let amount: string;
+  if (price >= CRORE) amount = `${trimDecimals(price / CRORE)} Crore`;
+  else if (price >= LAKH) amount = `${trimDecimals(price / LAKH)} Lakh`;
+  else amount = numberFormatter.format(price);
+  return `PKR ${amount}${listingType === 'rent' ? '/mo' : ''}`;
 }
 
-/** Short price for map pins: $950, $615K, $1.3M. Hand-rolled because Hermes' Intl compact notation isn't guaranteed. */
+/** Short price for map pins: 6.5 Cr, 45 Lac, 85K. */
 export function formatCompactPrice(price: number, listingType: ListingType = 'sale'): string {
-  const suffix = listingType === 'rent' ? '/mo' : '';
-  if (price >= 1_000_000) return `$${trimZero((price / 1_000_000).toFixed(1))}M${suffix}`;
-  if (price >= 10_000) return `$${Math.round(price / 1_000)}K${suffix}`;
-  if (price >= 1_000) return `$${trimZero((price / 1_000).toFixed(1))}K${suffix}`;
-  return `$${Math.round(price)}${suffix}`;
-}
-
-function trimZero(value: string): string {
-  return value.endsWith('.0') ? value.slice(0, -2) : value;
+  let amount: string;
+  if (price >= CRORE) amount = `${trimDecimals(price / CRORE)} Cr`;
+  else if (price >= LAKH) amount = `${trimDecimals(price / LAKH)} Lac`;
+  else if (price >= 1_000) amount = `${Math.round(price / 1_000)}K`;
+  else amount = String(Math.round(price));
+  return `${amount}${listingType === 'rent' ? '/mo' : ''}`;
 }
 
 export function formatArea(area: number): string {
@@ -38,4 +44,14 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
 
 export function formatDate(isoDate: string): string {
   return dateFormatter.format(new Date(isoDate));
+}
+
+const timeFormatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
+const shortDateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+
+/** Chat timestamps: a time for today ("3:45 PM"), otherwise a short date ("Oct 2"). */
+export function formatMessageTime(isoDate: string): string {
+  const date = new Date(isoDate);
+  const isToday = date.toDateString() === new Date().toDateString();
+  return isToday ? timeFormatter.format(date) : shortDateFormatter.format(date);
 }

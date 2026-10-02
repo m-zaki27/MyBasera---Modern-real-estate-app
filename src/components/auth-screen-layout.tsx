@@ -1,6 +1,9 @@
+import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { APP_NAME } from '@/constants/brand';
 
 type AuthScreenLayoutProps = {
   title: string;
@@ -20,6 +23,17 @@ export function AuthScreenLayout({ title, subtitle, error, children }: AuthScree
           <ScrollView
             contentContainerClassName="flex-grow justify-center gap-6 px-screen py-10"
             keyboardShouldPersistTaps="handled">
+            <View className="flex-row items-center gap-3">
+              <Image
+                source={require('@/assets/images/logo.png')}
+                className="h-12 w-12"
+                contentFit="contain"
+                accessibilityLabel={`${APP_NAME} logo`}
+              />
+              <Text className="text-xl font-bold text-foreground dark:text-foreground-dark">
+                {APP_NAME}
+              </Text>
+            </View>
             <View className="gap-2">
               <Text className="text-3xl font-bold text-foreground dark:text-foreground-dark">{title}</Text>
               {subtitle ? (

@@ -10,7 +10,8 @@ import {
   FACILITIES,
   LISTING_TYPE_OPTIONS,
   MIN_ROOM_OPTIONS,
-  PRICE_RANGES,
+  RENT_PRICE_RANGES,
+  SALE_PRICE_RANGES,
   PROPERTY_TYPE_FILTERS,
   SORT_OPTIONS,
 } from '@/constants/property';
@@ -62,7 +63,8 @@ export default function ExploreFiltersScreen() {
                 key={option.key}
                 label={option.label}
                 selected={filters.listingType === option.key}
-                onPress={() => setFilters({ listingType: option.key })}
+                // Sale and rent use different price bands, so a chosen band can't carry over.
+                onPress={() => setFilters({ listingType: option.key, priceRange: 'any' })}
               />
             ))}
           </View>
@@ -76,9 +78,9 @@ export default function ExploreFiltersScreen() {
           />
         </Section>
 
-        <Section title="Price">
+        <Section title={filters.listingType === 'rent' ? 'Monthly rent' : 'Price'}>
           <View className="flex-row flex-wrap gap-2 px-screen">
-            {PRICE_RANGES.map((range) => (
+            {(filters.listingType === 'rent' ? RENT_PRICE_RANGES : SALE_PRICE_RANGES).map((range) => (
               <Chip
                 key={range.key}
                 label={range.label}

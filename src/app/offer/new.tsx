@@ -110,7 +110,7 @@ export default function NewOfferScreen() {
           <View className="gap-1 rounded-card bg-surface p-4 dark:bg-surface-dark">
             <Text className="text-base font-bold text-foreground dark:text-foreground-dark">{property.name}</Text>
             <Text className="text-sm text-muted dark:text-muted-dark">{property.address}</Text>
-            <Text className="text-sm text-primary">
+            <Text className="text-sm text-primary dark:text-primary-300">
               Asking {formatPrice(property.price, property.listing_type)}
             </Text>
           </View>

@@ -80,3 +80,15 @@ export async function deleteListing(propertyId: string): Promise<void> {
   if (error) throw new Error(error.message);
   if (count === 0) throw new Error("This listing couldn't be deleted. It may belong to someone else.");
 }
+
+/** Owner marks a for-sale listing as sold (hides it from browsing, closes open offers). */
+export async function markListingSold(propertyId: string): Promise<void> {
+  const { error } = await supabase.rpc('mark_listing_sold', { listing: propertyId });
+  if (error) throw new Error(error.message);
+}
+
+/** Undo a manual "sold" so the listing is active again. */
+export async function relistListing(propertyId: string): Promise<void> {
+  const { error } = await supabase.rpc('relist_listing', { listing: propertyId });
+  if (error) throw new Error(error.message);
+}

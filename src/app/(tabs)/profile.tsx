@@ -1,13 +1,19 @@
 import { useClerk, useUser } from '@clerk/expo';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
 import { ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BrandMark } from '@/components/brand-mark';
+import { GradientView } from '@/components/gradient-view';
+import { PressableScale } from '@/components/pressable-scale';
 import { PrimaryButton } from '@/components/primary-button';
 import { ProfileAvatar } from '@/components/profile-avatar';
 import { SegmentedControl } from '@/components/segmented-control';
 import { SettingsRow, SettingsSection } from '@/components/settings-row';
+import { colors } from '@/constants/colors';
 import { useMyListings } from '@/hooks/use-my-listings';
 import { deleteAccount } from '@/lib/account';
 import { confirmAction, showAlert } from '@/lib/alert';
@@ -36,7 +42,14 @@ type StatProps = {
 function Stat({ value, label, onPress }: StatProps) {
   return (
     <View className="flex-1">
-      <PrimaryButton title={`${value} ${label}`} onPress={onPress} variant="outline" />
+      <PressableScale
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${value} ${label}`}
+        className="items-center rounded-2xl bg-surface py-3 dark:bg-background-dark">
+        <Text className="text-2xl font-extrabold text-primary dark:text-primary-300">{value}</Text>
+        <Text className="text-xs font-medium text-muted dark:text-muted-dark">{label}</Text>
+      </PressableScale>
     </View>
   );
 }
@@ -46,6 +59,7 @@ export default function ProfileScreen() {
   const { signOut } = useClerk();
   const favoriteCount = useFavoritesStore((state) => Object.keys(state.ids).length);
   const { listings } = useMyListings();
+  const insets = useSafeAreaInsets();
 
   const [appearance, setAppearance] = useState<AppearancePreference>('system');
   const [signingOut, setSigningOut] = useState(false);
@@ -96,12 +110,19 @@ export default function ProfileScreen() {
 
   return (
     <View className="flex-1 bg-background dark:bg-background-dark">
-      {/* SafeAreaView isn't className-aware without a cssInterop mapping; flex is its only style. */}
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-        <ScrollView contentContainerClassName="gap-7 px-screen pb-10 pt-2">
-          <Text className="text-2xl font-bold text-foreground dark:text-foreground-dark">Profile</Text>
+      <StatusBar style="light" />
+      <ScrollView contentContainerClassName="gap-7 pb-12" showsVerticalScrollIndicator={false}>
+        <GradientView
+          colors={[colors.sunset.DEFAULT, colors.teal[500], colors.teal.DEFAULT]}
+          className="px-screen pb-20"
+          // Extend the gradient behind the status bar.
+          style={{ paddingTop: insets.top + 12 }}>
+          <BrandMark size={28} tone="light" />
+          <Text className="pt-5 text-3xl font-extrabold tracking-tight text-white">Profile</Text>
+        </GradientView>
 
-          <View className="items-center gap-3">
+        <Animated.View entering={FadeInDown.duration(400)}>
+          <View className="-mt-20 mx-screen items-center gap-3 rounded-card border border-border bg-background p-5 shadow-lg shadow-black/10 dark:border-border-dark dark:bg-surface-dark">
             <ProfileAvatar />
             <View className="items-center gap-1">
               <Text className="text-xl font-bold text-foreground dark:text-foreground-dark">
@@ -114,13 +135,14 @@ export default function ProfileScreen() {
                 </Text>
               ) : null}
             </View>
+            <View className="flex-row gap-3 self-stretch pt-1">
+              <Stat value={favoriteCount} label="Saved homes" onPress={() => router.navigate('/favorites')} />
+              <Stat value={listings.length} label="My listings" onPress={() => router.push('/my-listings')} />
+            </View>
           </View>
+        </Animated.View>
 
-          <View className="flex-row gap-3">
-            <Stat value={favoriteCount} label="saved" onPress={() => router.navigate('/favorites')} />
-            <Stat value={listings.length} label="listings" onPress={() => router.push('/my-listings')} />
-          </View>
-
+        <View className="gap-7 px-screen">
           <SettingsSection title="Activity">
             <SettingsRow
               icon={{ ios: 'bubble.left.and.bubble.right', android: 'chat', web: 'chat' }}
@@ -200,8 +222,8 @@ export default function ProfileScreen() {
               />
             </SettingsSection>
           </View>
-        </ScrollView>
-      </SafeAreaView>
+        </View>
+      </ScrollView>
     </View>
   );
 }

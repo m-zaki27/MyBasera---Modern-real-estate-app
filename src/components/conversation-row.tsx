@@ -52,7 +52,7 @@ export function ConversationRow({ conversation, myUserId }: ConversationRowProps
               {formatMessageTime(conversation.last_message_at)}
             </Text>
           </View>
-          <Text className="text-xs text-primary" numberOfLines={1}>
+          <Text className="text-xs text-primary dark:text-primary-300" numberOfLines={1}>
             {iAmBuyer ? '' : 'Your listing · '}
             {conversation.property?.name ?? 'Listing removed'}
           </Text>

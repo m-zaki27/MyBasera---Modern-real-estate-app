@@ -1,23 +1,31 @@
 import { Link } from 'expo-router';
-import { Pressable } from 'react-native';
+import { View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { PressableScale } from '@/components/pressable-scale';
 import { PropertyCard } from '@/components/property-card';
 import type { PropertyListItem } from '@/hooks/use-properties';
 
 type PropertyCardLinkProps = {
   property: PropertyListItem;
+  /** Position in the list, for a short staggered entrance (only the first few animate). */
+  index?: number;
 };
 
-/** A property card that opens the details screen. */
-export function PropertyCardLink({ property }: PropertyCardLinkProps) {
+const ANIMATED_ITEMS = 6;
+
+/** A property card that opens the details screen, with an entrance and press animation. */
+export function PropertyCardLink({ property, index = ANIMATED_ITEMS }: PropertyCardLinkProps) {
   return (
-    <Link href={{ pathname: '/property/[id]', params: { id: property.id } }} asChild>
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel={`${property.name}, view details`}
-        className="px-screen active:opacity-80">
-        <PropertyCard property={property} />
-      </Pressable>
-    </Link>
+    <Animated.View
+      entering={index < ANIMATED_ITEMS ? FadeInDown.delay(index * 60).duration(400) : undefined}>
+      <View className="px-screen">
+        <Link href={{ pathname: '/property/[id]', params: { id: property.id } }} asChild>
+          <PressableScale accessibilityRole="link" accessibilityLabel={`${property.name}, view details`}>
+            <PropertyCard property={property} />
+          </PressableScale>
+        </Link>
+      </View>
+    </Animated.View>
   );
 }

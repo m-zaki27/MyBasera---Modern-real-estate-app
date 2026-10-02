@@ -76,7 +76,7 @@ export function PhotoField({ value, onChange }: PhotoFieldProps) {
               tintColor={colors.primary.DEFAULT}
               size={32}
             />
-            <Text className="text-sm font-semibold text-primary">Add a photo</Text>
+            <Text className="text-sm font-semibold text-primary dark:text-primary-300">Add a photo</Text>
             <Text className="text-xs text-muted dark:text-muted-dark">JPEG or PNG, up to 5 MB</Text>
           </View>
         )}

@@ -111,7 +111,7 @@ export function CoordinatesField({ latitude, longitude, onChange, error }: Coord
             <Text
               onPress={() => Linking.openSettings()}
               accessibilityRole="link"
-              className="text-sm font-semibold text-primary">
+              className="text-sm font-semibold text-primary dark:text-primary-300">
               Open Settings
             </Text>
           ) : null}

@@ -43,11 +43,11 @@ export function DealBanner({ conversation, deals, mySide }: DealBannerProps) {
           <Text className="text-sm font-bold text-foreground dark:text-foreground-dark">
             {formatPrice(shown.amount, shown.deal_type)}
           </Text>
-          <Text className={`text-xs ${myTurn ? 'font-semibold text-primary' : 'text-muted dark:text-muted-dark'}`}>
+          <Text className={`text-xs ${myTurn ? 'font-semibold text-primary dark:text-primary-300' : 'text-muted dark:text-muted-dark'}`}>
             {describeStatus(shown, mySide)}
           </Text>
         </View>
-        <Text className="text-sm font-semibold text-primary">View deal</Text>
+        <Text className="text-sm font-semibold text-primary dark:text-primary-300">View deal</Text>
       </Pressable>
     );
   }

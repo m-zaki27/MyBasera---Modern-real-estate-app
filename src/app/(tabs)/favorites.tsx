@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
 import type { ReactElement } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
 import { PropertyCardLink } from '@/components/property-card-link';
+import { ScreenHeader } from '@/components/screen-header';
+import { PropertyCardSkeleton } from '@/components/skeleton';
 import { colors } from '@/constants/colors';
 import { useFavoriteProperties } from '@/hooks/use-favorite-properties';
 
@@ -14,8 +16,9 @@ export default function FavoritesScreen() {
   let emptyState: ReactElement;
   if (loading) {
     emptyState = (
-      <View className="items-center py-16">
-        <ActivityIndicator color={colors.primary.DEFAULT} />
+      <View className="gap-4">
+        <PropertyCardSkeleton />
+        <PropertyCardSkeleton />
       </View>
     );
   } else if (error) {
@@ -49,18 +52,16 @@ export default function FavoritesScreen() {
         <FlatList
           data={error ? [] : properties}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PropertyCardLink property={item} />}
+          renderItem={({ item, index }) => <PropertyCardLink property={item} index={index} />}
           ListHeaderComponent={
-            <View className="gap-1 px-screen pb-4 pt-2">
-              <Text className="text-2xl font-bold text-foreground dark:text-foreground-dark">
-                Favorites
-              </Text>
-              {properties.length > 0 ? (
-                <Text className="text-sm text-muted dark:text-muted-dark">
-                  {properties.length} saved {properties.length === 1 ? 'property' : 'properties'}
-                </Text>
-              ) : null}
-            </View>
+            <ScreenHeader
+              title="Favorites"
+              subtitle={
+                properties.length > 0
+                  ? `${properties.length} saved ${properties.length === 1 ? 'home' : 'homes'}`
+                  : 'Homes you save show up here'
+              }
+            />
           }
           ListEmptyComponent={emptyState}
           contentContainerClassName="gap-4 pb-8"

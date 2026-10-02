@@ -75,7 +75,7 @@ export function AgentCard({ agent }: AgentCardProps) {
             <Text className="text-base font-semibold text-foreground dark:text-foreground-dark">
               {agent.name}
             </Text>
-            <Text className="text-sm text-primary">View profile</Text>
+            <Text className="text-sm text-primary dark:text-primary-300">View profile</Text>
           </View>
         </Pressable>
       </Link>

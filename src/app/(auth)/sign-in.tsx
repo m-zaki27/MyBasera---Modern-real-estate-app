@@ -122,7 +122,7 @@ export default function SignInScreen() {
       <View className="flex-row justify-center gap-1">
         <Text className="text-muted dark:text-muted-dark">Don&apos;t have an account?</Text>
         <Link href="/sign-up" replace>
-          <Text className="font-semibold text-primary">Sign up</Text>
+          <Text className="font-semibold text-primary dark:text-primary-300">Sign up</Text>
         </Link>
       </View>
     </AuthScreenLayout>

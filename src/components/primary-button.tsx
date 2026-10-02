@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 
+import { PressableScale } from '@/components/pressable-scale';
 import { colors } from '@/constants/colors';
 
 type PrimaryButtonProps = {
@@ -32,7 +33,7 @@ export function PrimaryButton({
   const isDisabled = disabled || loading;
 
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       onPress={onPress}
@@ -43,6 +44,6 @@ export function PrimaryButton({
       ) : (
         <Text className={`text-base font-semibold ${textClasses[variant]}`}>{title}</Text>
       )}
-    </Pressable>
+    </PressableScale>
   );
 }

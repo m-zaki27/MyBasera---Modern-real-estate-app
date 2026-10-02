@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import type { ColorValue } from 'react-native';
+import { useColorScheme, type ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/colors';
 
@@ -14,8 +15,23 @@ function TabIcon({ name, color }: TabIconProps) {
 }
 
 export default function TabLayout() {
+  const isDark = useColorScheme() === 'dark';
+  const insets = useSafeAreaInsets();
+
   return (
-    <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.primary.DEFAULT }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: isDark ? colors.primary[300] : colors.primary.DEFAULT,
+        tabBarInactiveTintColor: isDark ? colors.muted.dark : colors.muted.DEFAULT,
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarStyle: {
+          backgroundColor: isDark ? colors.background.dark : colors.background.DEFAULT,
+          borderTopColor: isDark ? colors.border.dark : colors.border.DEFAULT,
+          height: 64 + insets.bottom,
+          paddingTop: 6,
+        },
+      }}>
       <Tabs.Screen
         name="index"
         options={{

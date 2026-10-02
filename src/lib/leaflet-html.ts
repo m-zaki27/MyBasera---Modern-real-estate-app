@@ -87,11 +87,11 @@ export function buildLeafletPage({
     border: 1px solid #E5E7EB;
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   }
-  .pin.selected { background: #0061FF; color: #FFFFFF; border-color: #0061FF; }
+  .pin.selected { background: #C2472B; color: #FFFFFF; border-color: #C2472B; }
   .dot {
     transform: translate(-50%, -50%);
     width: 18px; height: 18px; border-radius: 50%;
-    background: #E5484D; border: 3px solid #FFFFFF;
+    background: #C2472B; border: 3px solid #FFFFFF;
     box-shadow: 0 1px 4px rgba(0,0,0,0.35);
   }
   .leaflet-div-icon { background: transparent; border: none; }

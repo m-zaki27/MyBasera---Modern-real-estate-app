@@ -335,6 +335,14 @@ export type Database = {
         Args: { deal: string; reason: string };
         Returns: Database['public']['Tables']['deals']['Row'];
       };
+      mark_listing_sold: {
+        Args: { listing: string };
+        Returns: Database['public']['Tables']['properties']['Row'];
+      };
+      relist_listing: {
+        Args: { listing: string };
+        Returns: Database['public']['Tables']['properties']['Row'];
+      };
       mark_deal_complete: {
         Args: { deal: string };
         Returns: Database['public']['Tables']['deals']['Row'];

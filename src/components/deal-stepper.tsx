@@ -28,7 +28,7 @@ export function DealStepper({ current, stopped = false }: DealStepperProps) {
               <View className={`h-0.5 flex-1 ${index === 0 ? 'bg-transparent' : done || active ? 'bg-primary' : 'bg-border dark:bg-border-dark'}`} />
               <View className={`h-7 w-7 items-center justify-center rounded-full border-2 ${circle}`}>
                 <Text
-                  className={`text-xs font-bold ${done || (active && stopped) ? 'text-white' : active ? 'text-primary' : 'text-muted dark:text-muted-dark'}`}>
+                  className={`text-xs font-bold ${done || (active && stopped) ? 'text-white' : active ? 'text-primary dark:text-primary-300' : 'text-muted dark:text-muted-dark'}`}>
                   {done ? '✓' : index + 1}
                 </Text>
               </View>

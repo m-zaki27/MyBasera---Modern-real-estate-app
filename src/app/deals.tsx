@@ -46,7 +46,7 @@ function DealRow({ deal, myUserId }: DealRowProps) {
             </View>
           ) : null}
         </View>
-        <Text className="text-sm text-primary">{formatPrice(deal.amount, deal.deal_type)}</Text>
+        <Text className="text-sm text-primary dark:text-primary-300">{formatPrice(deal.amount, deal.deal_type)}</Text>
         <Text className="text-xs text-muted dark:text-muted-dark" numberOfLines={1}>
           {describeStatus(deal, mySide)}
         </Text>

@@ -9,6 +9,7 @@ import { AgentListItem } from '@/components/agent-list-item';
 import { PrimaryButton } from '@/components/primary-button';
 import { PropertyCardLink } from '@/components/property-card-link';
 import { PropertyMap } from '@/components/property-map';
+import { ScreenHeader } from '@/components/screen-header';
 import { SegmentedControl } from '@/components/segmented-control';
 import { colors } from '@/constants/colors';
 import { useAgents } from '@/hooks/use-agents';
@@ -132,8 +133,8 @@ export default function ExploreScreen() {
     <View className="flex-1 bg-background dark:bg-background-dark">
       {/* SafeAreaView isn't className-aware without a cssInterop mapping; flex is its only style. */}
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-        <View className="gap-4 px-screen pb-3 pt-2">
-          <Text className="text-2xl font-bold text-foreground dark:text-foreground-dark">Explore</Text>
+        <ScreenHeader title="Explore" subtitle="Filter, map and meet the agents" />
+        <View className="gap-4 px-screen pb-3">
           <SegmentedControl options={VIEW_OPTIONS} selected={view} onSelect={setView} />
           {view !== 'agents' ? (
             <View className="flex-row items-center justify-between">

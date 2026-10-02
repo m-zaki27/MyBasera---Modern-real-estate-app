@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ConversationRow } from '@/components/conversation-row';
 import { PrimaryButton } from '@/components/primary-button';
+import { ScreenHeader } from '@/components/screen-header';
 import { colors } from '@/constants/colors';
 import { useConversations } from '@/hooks/use-conversations';
 
@@ -21,11 +22,7 @@ export default function MessagesScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <ConversationRow conversation={item} myUserId={userId ?? ''} />}
           ItemSeparatorComponent={() => <View className="ml-[76px] h-px bg-border dark:bg-border-dark" />}
-          ListHeaderComponent={
-            <Text className="px-screen pb-3 pt-2 text-2xl font-bold text-foreground dark:text-foreground-dark">
-              Messages
-            </Text>
-          }
+          ListHeaderComponent={<ScreenHeader title="Messages" subtitle="Chats with agents and buyers" />}
           ListEmptyComponent={
             loading ? (
               <View className="items-center py-16">

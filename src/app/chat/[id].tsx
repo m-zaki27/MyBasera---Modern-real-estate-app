@@ -52,7 +52,7 @@ export default function ChatScreen() {
           {error ?? 'This conversation isn’t available.'}
         </Text>
         <Pressable onPress={goBack} accessibilityRole="button">
-          <Text className="font-semibold text-primary">Go back</Text>
+          <Text className="font-semibold text-primary dark:text-primary-300">Go back</Text>
         </Pressable>
       </View>
     );
@@ -124,7 +124,7 @@ export default function ChatScreen() {
                   <Text className="text-sm font-semibold text-foreground dark:text-foreground-dark" numberOfLines={1}>
                     {property.name}
                   </Text>
-                  <Text className="text-sm text-primary">{formatPrice(property.price, property.listing_type)}</Text>
+                  <Text className="text-sm text-primary dark:text-primary-300">{formatPrice(property.price, property.listing_type)}</Text>
                 </View>
                 <StatusBadge status={property.status} />
               </Pressable>

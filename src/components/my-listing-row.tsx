@@ -32,7 +32,7 @@ export function MyListingRow({ listing }: MyListingRowProps) {
             numberOfLines={1}>
             {listing.name}
           </Text>
-          <Text className="text-sm font-semibold text-primary">
+          <Text className="text-sm font-semibold text-primary dark:text-primary-300">
             {formatPrice(listing.price, listing.listing_type)}
           </Text>
           <Text className="text-xs text-muted dark:text-muted-dark" numberOfLines={1}>

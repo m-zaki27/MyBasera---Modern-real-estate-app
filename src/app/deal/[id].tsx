@@ -295,7 +295,7 @@ export default function DealScreen() {
             <Section title="Next steps">
               {nextStepsAfterAcceptance(deal.deal_type).map((item, index) => (
                 <View key={item} className="flex-row gap-3">
-                  <Text className="w-5 text-sm font-bold text-primary">{index + 1}.</Text>
+                  <Text className="w-5 text-sm font-bold text-primary dark:text-primary-300">{index + 1}.</Text>
                   <Text className="flex-1 text-sm leading-5 text-foreground dark:text-foreground-dark">{item}</Text>
                 </View>
               ))}
